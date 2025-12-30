@@ -317,3 +317,59 @@ footer {
   opacity: 0.5;
   cursor: not-allowed;
 }
+/* HUB PAGE */
+.hub-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.hub-header h1 {
+  font-size: 28px;
+  margin-bottom: 6px;
+  text-transform: capitalize;
+}
+
+.hub-header p {
+  color: #94a3b8;
+  margin-bottom: 32px;
+}
+
+/* STATES */
+.hub-error {
+  color: #f87171;
+}
+
+.hub-empty {
+  color: #94a3b8;
+}
+
+/* GRID */
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* CARD */
+.hub-card {
+  padding: 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.hub-card h3 {
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+
+.hub-address {
+  font-size: 14px;
+  color: #cbd5e1;
+}
+
+.hub-rent {
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
