@@ -1,75 +1,86 @@
-import { createClient } from "@supabase/supabase-js";
+export const metadata = {
+  title: "Weekend Spots for IT Professionals in Bangalore | TechLifePortal",
+  description:
+    "Discover weekend hangouts, short trips, walks and chill spots near Bangalore tech hubs. Curated for IT professionals.",
+};
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-export default async function WeekendSpotsPage() {
-  const { data: spots, error } = await supabase
-    .from("weekend_spots")
-    .select("id, name, description, location")
-    .eq("status", "approved")
-    .order("created_at", { ascending: false });
-
+export default function WeekendSpotsPage() {
   return (
-    <main className="min-h-screen bg-slate-50">
-      {/* HEADER */}
-      <section className="max-w-6xl mx-auto px-6 pt-16 pb-10">
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
-          Weekend Spots for Bangalore IT Professionals
+    <main className="max-w-5xl mx-auto px-6 py-14">
+      {/* Header */}
+      <section className="mb-12 text-center">
+        <h1 className="text-4xl font-bold text-gray-900">
+          Weekend Spots for IT Professionals
         </h1>
-
-        <p className="mt-3 max-w-3xl text-slate-600">
-          Short getaways, hangout places, and calm escapes curated for people
-          working in tech — easy to plan after a busy workweek.
+        <p className="mt-4 text-gray-600 text-lg">
+          Short rides, walks, malls and hangout places Bangalore IT folks usually
+          visit to unwind after a busy work week.
         </p>
       </section>
 
-      {/* CONTENT */}
-      <section className="max-w-6xl mx-auto px-6 pb-20">
-        {error && (
-          <p className="text-red-500">
-            Unable to load weekend spots right now.
+      {/* Cards */}
+      <section className="space-y-6">
+        {/* Spot 1 */}
+        <div className="rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Whitefield Tech Park Food Street
+          </h2>
+          <p className="mt-1 text-sm text-gray-500">
+            📍 Whitefield · 🍔 Food / Hangout
           </p>
-        )}
+          <p className="mt-3 text-gray-700">
+            A popular evening food street near major tech parks. Perfect for
+            casual team outings, post-work snacks and relaxed weekend nights.
+          </p>
+        </div>
 
-        {!spots || spots.length === 0 ? (
-          <div className="rounded-xl border bg-white p-8 text-slate-600">
-            Weekend spots will appear here soon.
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {spots.map((spot) => (
-              <div
-                key={spot.id}
-                className="rounded-xl border bg-white p-5 shadow-sm hover:shadow-md transition"
-              >
-                <h3 className="text-lg font-semibold text-slate-800">
-                  {spot.name}
-                </h3>
+        {/* Spot 2 */}
+        <div className="rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition">
+          <h2 className="text-xl font-semibold text-gray-900">
+            JP Nagar Mini Forest Walk
+          </h2>
+          <p className="mt-1 text-sm text-gray-500">
+            📍 JP Nagar · 🌿 Nature / Walk
+          </p>
+          <p className="mt-3 text-gray-700">
+            A peaceful walking trail surrounded by greenery. Ideal for calm
+            weekend mornings and mental reset after a long work week.
+          </p>
+        </div>
 
-                {spot.location && (
-                  <p className="mt-1 text-sm text-slate-500">
-                    {spot.location}
-                  </p>
-                )}
+        {/* Spot 3 */}
+        <div className="rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Agara Lake Evening Walk
+          </h2>
+          <p className="mt-1 text-sm text-gray-500">
+            📍 HSR / Bellandur · 🚶 Leisure Walk
+          </p>
+          <p className="mt-3 text-gray-700">
+            Well-maintained lake with walking paths and sunset views. A favorite
+            evening unwind spot for Bellandur and HSR tech employees.
+          </p>
+        </div>
 
-                <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-                  {spot.description?.slice(0, 140)}…
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
+        {/* Spot 4 */}
+        <div className="rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Nexus Mall – Bellandur
+          </h2>
+          <p className="mt-1 text-sm text-gray-500">
+            📍 Bellandur · 🛍 Mall / Hangout
+          </p>
+          <p className="mt-3 text-gray-700">
+            A popular weekend hangout with food courts, movies and brand stores.
+            Commonly visited by IT professionals working around ORR.
+          </p>
+        </div>
       </section>
 
-      {/* FOOTER NOTE */}
-      <footer className="border-t bg-white">
-        <div className="max-w-6xl mx-auto px-6 py-6 text-sm text-slate-500">
-          Curated for Bangalore IT professionals • TechLifePortal
-        </div>
-      </footer>
+      {/* Footer note */}
+      <section className="mt-16 text-center text-sm text-gray-500">
+        Built for Bangalore IT professionals · Curated by TechLifePortal
+      </section>
     </main>
   );
 }
