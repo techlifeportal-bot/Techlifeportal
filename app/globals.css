@@ -1,42 +1,9 @@
-/* ===============================
-   TechLifePortal – Global Styles
-   Premium Dark / Light Theme
-================================ */
+/* ============================
+   TechLifePortal – Global CSS
+   Premium IT Look
+============================= */
 
-:root {
-  --bg-main: #0b1220;
-  --bg-gradient: radial-gradient(
-    circle at top,
-    #111a33 0%,
-    #050914 60%
-  );
-  --card-bg: #0f172a;
-  --card-border: #1e293b;
-  --text-main: #e5e7eb;
-  --text-muted: #9ca3af;
-  --accent: #3b82f6;
-  --accent-soft: rgba(59, 130, 246, 0.15);
-  --radius: 16px;
-  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.35);
-  --shadow-hover: 0 18px 45px rgba(59, 130, 246, 0.35);
-}
-
-/* Light mode override */
-[data-theme="light"] {
-  --bg-main: #f8fafc;
-  --bg-gradient: linear-gradient(180deg, #ffffff, #f1f5f9);
-  --card-bg: #ffffff;
-  --card-border: #e5e7eb;
-  --text-main: #0f172a;
-  --text-muted: #475569;
-  --shadow-soft: 0 8px 20px rgba(0, 0, 0, 0.08);
-  --shadow-hover: 0 16px 32px rgba(59, 130, 246, 0.25);
-}
-
-/* ===============================
-   Base Reset
-================================ */
-
+/* Reset */
 * {
   box-sizing: border-box;
 }
@@ -45,148 +12,98 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--bg-gradient);
-  color: var(--text-main);
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+}
+
+/* ============================
+   Typography (Premium)
+============================= */
+
+:root {
+  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Inter, Helvetica, Arial, sans-serif;
+
+  --bg-main: #0b1220;
+  --bg-card: #111a2e;
+
+  --text-primary: #e6ebf2;
+  --text-secondary: #a9b1c7;
+  --text-muted: #7b849c;
+
+  --accent-blue: #4da3ff;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-main);
+  color: var(--text-primary);
   line-height: 1.6;
 }
 
-/* ===============================
-   Layout Container
-================================ */
-
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 64px 24px;
-}
-
-/* ===============================
-   Typography
-================================ */
+/* ============================
+   Headings
+============================= */
 
 h1 {
-  font-size: clamp(2.4rem, 5vw, 3.2rem);
-  font-weight: 700;
-  text-align: center;
+  font-size: 2.4rem;
+  font-weight: 600;
+  letter-spacing: -0.4px;
   margin-bottom: 12px;
 }
 
 h2 {
-  font-size: 1.5rem;
-  margin-bottom: 12px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 8px;
 }
+
+h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* ============================
+   Text
+============================= */
 
 p {
-  color: var(--text-muted);
-  margin: 0 0 12px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
 }
 
-/* ===============================
-   Cards
-================================ */
+/* ============================
+   Links
+============================= */
 
-.card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  padding: 28px;
-  box-shadow: var(--shadow-soft);
-  transition: transform 0.25s ease, box-shadow 0.25s ease,
-    border-color 0.25s ease;
-}
-
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-hover);
-  border-color: var(--accent);
-}
-
-/* ===============================
-   Homepage Feature Grid
-================================ */
-
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 28px;
-  margin-top: 48px;
-}
-
-/* ===============================
-   Feature Links
-================================ */
-
-.feature-link {
-  color: var(--accent);
-  font-weight: 500;
+a {
+  color: var(--accent-blue);
   text-decoration: none;
 }
 
-.feature-link:hover {
+a:hover {
   text-decoration: underline;
 }
 
-/* ===============================
-   Upcoming / Locked Section
-================================ */
+/* ============================
+   Cards (used in weekend / PGs)
+============================= */
 
-.upcoming {
-  margin-top: 64px;
-  padding: 32px;
-  border-radius: var(--radius);
-  border: 1px dashed var(--card-border);
-  text-align: center;
-  background: linear-gradient(
-    180deg,
-    rgba(59, 130, 246, 0.08),
-    rgba(59, 130, 246, 0.02)
-  );
+.card {
+  background-color: var(--bg-card);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* ===============================
-   Footer
-================================ */
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+}
 
-.footer {
-  text-align: center;
-  margin-top: 64px;
-  font-size: 0.9rem;
+/* ============================
+   Utility
+============================= */
+
+.text-muted {
   color: var(--text-muted);
-}
-
-/* ===============================
-   Theme Toggle Button
-================================ */
-
-.theme-toggle {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 1px solid var(--card-border);
-  background: var(--card-bg);
-  color: var(--text-main);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  box-shadow: var(--shadow-soft);
-  transition: transform 0.2s ease;
-}
-
-.theme-toggle:hover {
-  transform: scale(1.05);
-}
-
-/* ===============================
-   Mobile Polish
-================================ */
-
-@media (max-width: 640px) {
-  .container {
-    padding: 48px 16px;
-  }
 }
