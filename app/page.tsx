@@ -1,150 +1,82 @@
-export const metadata = {
-  title: "TechLifePortal – For Bangalore IT Professionals",
-  description:
-    "TechLifePortal helps Bangalore IT professionals discover weekend spots and PG stays near major tech hubs. Simple, focused and built for tech life.",
-};
-
-import Link from "next/link";
-
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100">
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-900">
+      
       {/* HERO SECTION */}
-      <section className="max-w-6xl mx-auto px-6 pt-28 pb-24">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-          TechLifePortal
-        </h1>
+      <section className="max-w-6xl mx-auto px-6 pt-20 pb-16">
+        <div className="text-center">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+            TechLifePortal
+          </h1>
 
-        <p className="mt-3 text-lg text-slate-400">
-          Built for Bangalore IT professionals
-        </p>
+          <p className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+            A lifestyle guide built <strong>for Bangalore IT professionals</strong>.
+            Discover weekend spots and PGs near tech hubs — curated for tech life.
+          </p>
 
-        <p className="mt-6 max-w-2xl text-slate-300 leading-relaxed">
-          A focused portal to discover weekend spots and PG stays around Bangalore
-          tech hubs. No clutter. No noise. Just what IT professionals need.
-        </p>
-
-        <div className="mt-10 flex flex-wrap gap-4">
-          <Link
-            href="/weekend-spots"
-            className="px-6 py-3 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-500 transition"
-          >
-            Explore Weekend Spots
-          </Link>
-
-          <Link
-            href="/pgs"
-            className="px-6 py-3 rounded-lg border border-slate-700 text-slate-200 hover:bg-slate-900 transition"
-          >
-            Find PGs Near Office
-          </Link>
+          <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-1 text-sm text-blue-700">
+            🚀 Soft Launch • Bangalore IT Community
+          </div>
         </div>
-
-        <p className="mt-8 text-sm text-slate-500">
-          Soft launch • Focused on Bangalore IT lifestyle
-        </p>
       </section>
 
-      {/* FEATURE PREVIEW */}
-      <section className="max-w-6xl mx-auto px-6 pb-28 space-y-20">
-        {/* WEEKEND SPOTS PREVIEW */}
-        <div>
-          <h2 className="text-2xl font-semibold">
-            Weekend Spots
-          </h2>
-          <p className="mt-2 text-slate-400">
-            Short getaways and hangout places preferred by IT professionals.
-          </p>
-
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                title: "Nandi Hills Sunrise Ride",
-                desc: "Quick early-morning escape before the city wakes up.",
-              },
-              {
-                title: "JP Nagar Mini Forest",
-                desc: "Calm walking trail for mental reset after a long week.",
-              },
-              {
-                title: "Agara Lake Walk",
-                desc: "Popular evening unwind spot near ORR tech offices.",
-              },
-            ].map((spot) => (
-              <div
-                key={spot.title}
-                className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-slate-700 transition"
-              >
-                <h3 className="font-semibold text-slate-100">
-                  {spot.title}
-                </h3>
-                <p className="mt-2 text-sm text-slate-400">
-                  {spot.desc}
-                </p>
-              </div>
-            ))}
+      {/* PRIMARY FEATURES */}
+      <section className="max-w-6xl mx-auto px-6 pb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          {/* Weekend Spots */}
+          <div className="rounded-2xl border border-slate-200 p-6 hover:shadow-md transition">
+            <h2 className="text-xl font-semibold mb-2">
+              🌴 Weekend Spots
+            </h2>
+            <p className="text-slate-600 mb-4">
+              Short trips, walks, food streets and hangout places IT employees
+              usually visit after a busy work week.
+            </p>
+            <a
+              href="/weekend-spots"
+              className="inline-block text-blue-600 font-medium hover:underline"
+            >
+              Explore weekend spots →
+            </a>
           </div>
 
-          <Link
-            href="/weekend-spots"
-            className="inline-block mt-6 text-indigo-400 hover:underline"
-          >
-            View all weekend spots →
-          </Link>
+          {/* PGs */}
+          <div className="rounded-2xl border border-slate-200 p-6 hover:shadow-md transition">
+            <h2 className="text-xl font-semibold mb-2">
+              🏠 PGs & Rentals
+            </h2>
+            <p className="text-slate-600 mb-4">
+              PGs and rental stays near Bangalore tech hubs —
+              useful for freshers and working professionals.
+            </p>
+            <a
+              href="/pgs"
+              className="inline-block text-blue-600 font-medium hover:underline"
+            >
+              View PGs & rentals →
+            </a>
+          </div>
+
         </div>
+      </section>
 
-        {/* PGs PREVIEW */}
-        <div>
-          <h2 className="text-2xl font-semibold">
-            PGs & Rentals
-          </h2>
-          <p className="mt-2 text-slate-400">
-            Stays near Bangalore tech parks, chosen for working professionals.
+      {/* COMING SOON */}
+      <section className="max-w-6xl mx-auto px-6 pb-20">
+        <div className="rounded-2xl bg-slate-50 border border-dashed border-slate-300 p-8 text-center">
+          <h3 className="text-lg font-semibold mb-2">
+            More features coming soon
+          </h3>
+          <p className="text-slate-600 max-w-xl mx-auto">
+            AI Resume Builder, Cafés, Gyms, Nearby Companies and IT Jobs will be
+            unlocked gradually as the community grows.
           </p>
-
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                title: "Men’s PG – Electronic City",
-                desc: "Walkable distance to major tech offices.",
-              },
-              {
-                title: "Coliving – Bellandur",
-                desc: "Furnished stay with flexible terms.",
-              },
-              {
-                title: "Budget PG – Whitefield",
-                desc: "Popular among new IT joiners.",
-              },
-            ].map((pg) => (
-              <div
-                key={pg.title}
-                className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-slate-700 transition"
-              >
-                <h3 className="font-semibold text-slate-100">
-                  {pg.title}
-                </h3>
-                <p className="mt-2 text-sm text-slate-400">
-                  {pg.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <Link
-            href="/pgs"
-            className="inline-block mt-6 text-indigo-400 hover:underline"
-          >
-            Explore PGs →
-          </Link>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-slate-800">
-        <div className="max-w-6xl mx-auto px-6 py-6 text-sm text-slate-500">
-          Built exclusively for Bangalore IT professionals • TechLifePortal (beta)
-        </div>
+      <footer className="border-t border-slate-200 py-6 text-center text-sm text-slate-500">
+        Made with ❤️ in Bangalore • TechLifePortal (Beta)
       </footer>
     </main>
   );
