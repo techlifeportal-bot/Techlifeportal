@@ -19,22 +19,55 @@ type Draft = {
 export default function AdminPage() {
   const [drafts, setDrafts] = useState<Draft[]>([])
   const [loading, setLoading] = useState(true)
+  const [generating, setGenerating] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
   const [approvingId, setApprovingId] = useState<string | null>(null)
 
+  // 📥 Load AI drafts
   useEffect(() => {
-    async function loadDrafts() {
-      const { data } = await supabase
-        .from('ai_suggested_spots')
-        .select('id, name, description, hub, category')
-        .order('created_at', { ascending: false })
-
-      setDrafts(data || [])
-      setLoading(false)
-    }
-
     loadDrafts()
   }, [])
 
+  async function loadDrafts() {
+    setLoading(true)
+    const { data, error } = await supabase
+      .from('ai_suggested_spots')
+      .select('id, name, description, hub, category')
+      .order('created_at', { ascending: false })
+
+    if (!error) {
+      setDrafts(data || [])
+    }
+
+    setLoading(false)
+  }
+
+  // 🤖 Manual AI trigger
+  async function generateAI() {
+    setGenerating(true)
+    setMessage(null)
+
+    try {
+      const res = await fetch('/api/ai/suggest', {
+        method: 'POST',
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'AI generation failed')
+      }
+
+      setMessage('AI suggestions generated successfully')
+      await loadDrafts()
+    } catch (err: any) {
+      setMessage(err.message)
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  // ✏️ Edit draft locally
   function updateDraft(
     id: string,
     field: keyof Draft,
@@ -47,22 +80,23 @@ export default function AdminPage() {
     )
   }
 
+  // ✅ Approve draft
   async function approveDraft(draft: Draft) {
     setApprovingId(draft.id)
 
-    const { error: insertError } = await supabase
+    const { error } = await supabase
       .from('approved_spots')
       .insert({
         name: draft.name,
         description: draft.description,
         hub: draft.hub,
         category: draft.category,
-        source: 'ai'
+        source: 'ai',
       })
 
-    if (insertError) {
+    if (error) {
       alert('Approval failed')
-      console.error(insertError)
+      console.error(error)
       setApprovingId(null)
       return
     }
@@ -79,22 +113,47 @@ export default function AdminPage() {
     setApprovingId(null)
   }
 
+  // ⏳ Loading screen
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        Loading admin dashboard…
+      </main>
+    )
+  }
+
   return (
     <main className="min-h-screen bg-gray-50 p-6">
-      {/* DEV MODE BANNER */}
-      <div className="mb-4 text-xs text-yellow-700 bg-yellow-100 p-2 rounded">
-        DEV MODE — AI suggestions, approval and publish are manual and safe
-      </div>
-
-      <h1 className="text-2xl font-semibold mb-6">
-        Admin — Review AI Drafts
+      <h1 className="text-2xl font-semibold mb-2">
+        Admin — AI Draft Review
       </h1>
 
-      {loading && <p>Loading drafts…</p>}
+      {/* 🟢 Automation status */}
+      <div className="mb-4 text-xs text-green-700 bg-green-100 p-2 rounded">
+        Automation status: MANUAL ONLY (admin-triggered)
+      </div>
 
-      {!loading && drafts.length === 0 && (
+      {/* 🤖 Generate AI */}
+      <div className="mb-6">
+        <button
+          onClick={generateAI}
+          disabled={generating}
+          className="bg-black text-white px-4 py-2 rounded disabled:opacity-50"
+        >
+          {generating ? 'Generating…' : 'Generate AI Suggestions'}
+        </button>
+
+        {message && (
+          <p className="mt-2 text-sm text-gray-700">
+            {message}
+          </p>
+        )}
+      </div>
+
+      {/* 📄 Draft list */}
+      {drafts.length === 0 && (
         <p className="text-gray-500">
-          No AI drafts pending review.
+          No AI drafts available.
         </p>
       )}
 
@@ -150,7 +209,7 @@ export default function AdminPage() {
             <button
               onClick={() => approveDraft(draft)}
               disabled={approvingId === draft.id}
-              className="bg-black text-white px-4 py-1 text-sm"
+              className="bg-green-600 text-white px-4 py-1 text-sm rounded"
             >
               {approvingId === draft.id
                 ? 'Approving…'
