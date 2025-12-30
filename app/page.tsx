@@ -1,10 +1,16 @@
+export const metadata = {
+  title: "TechLifePortal – For Bangalore IT Professionals",
+  description:
+    "TechLifePortal helps Bangalore IT professionals discover weekend spots and PG stays near major tech hubs. Simple, focused and built for tech life.",
+};
+
 import Link from "next/link";
 
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
-      {/* HERO */}
-      <section className="max-w-6xl mx-auto px-6 pt-24 pb-20">
+      {/* HERO SECTION */}
+      <section className="max-w-6xl mx-auto px-6 pt-28 pb-24">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
           TechLifePortal
         </h1>
@@ -14,8 +20,8 @@ export default function HomePage() {
         </p>
 
         <p className="mt-6 max-w-2xl text-slate-300 leading-relaxed">
-          Discover weekend spots and PG stays near Bangalore’s major tech hubs.
-          Curated for people working in tech — calm, useful, and focused.
+          A focused portal to discover weekend spots and PG stays around Bangalore
+          tech hubs. No clutter. No noise. Just what IT professionals need.
         </p>
 
         <div className="mt-10 flex flex-wrap gap-4">
@@ -35,42 +41,42 @@ export default function HomePage() {
         </div>
 
         <p className="mt-8 text-sm text-slate-500">
-          Beta launch • Focused on Bangalore IT lifestyle
+          Soft launch • Focused on Bangalore IT lifestyle
         </p>
       </section>
 
-      {/* PREVIEWS */}
-      <section className="max-w-6xl mx-auto px-6 pb-24 space-y-20">
-        {/* WEEKEND SPOTS */}
+      {/* FEATURE PREVIEW */}
+      <section className="max-w-6xl mx-auto px-6 pb-28 space-y-20">
+        {/* WEEKEND SPOTS PREVIEW */}
         <div>
           <h2 className="text-2xl font-semibold">
             Weekend Spots
           </h2>
           <p className="mt-2 text-slate-400">
-            Short, stress-free getaways popular among IT professionals.
+            Short getaways and hangout places preferred by IT professionals.
           </p>
 
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
-                name: "Nandi Hills Sunrise Ride",
-                desc: "Early morning escape before the crowd hits."
+                title: "Nandi Hills Sunrise Ride",
+                desc: "Quick early-morning escape before the city wakes up.",
               },
               {
-                name: "JP Nagar Mini Forest",
-                desc: "Quiet greenery for a slow weekend walk."
+                title: "JP Nagar Mini Forest",
+                desc: "Calm walking trail for mental reset after a long week.",
               },
               {
-                name: "Ramanagara Hills",
-                desc: "Short trek and sunset views near the city."
-              }
+                title: "Agara Lake Walk",
+                desc: "Popular evening unwind spot near ORR tech offices.",
+              },
             ].map((spot) => (
               <div
-                key={spot.name}
+                key={spot.title}
                 className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-slate-700 transition"
               >
                 <h3 className="font-semibold text-slate-100">
-                  {spot.name}
+                  {spot.title}
                 </h3>
                 <p className="mt-2 text-sm text-slate-400">
                   {spot.desc}
@@ -87,36 +93,36 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {/* PGs */}
+        {/* PGs PREVIEW */}
         <div>
           <h2 className="text-2xl font-semibold">
             PGs & Rentals
           </h2>
           <p className="mt-2 text-slate-400">
-            Stays near tech parks, preferred by working professionals.
+            Stays near Bangalore tech parks, chosen for working professionals.
           </p>
 
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
-                name: "Men’s PG – Electronic City",
-                desc: "Walkable distance to tech offices."
+                title: "Men’s PG – Electronic City",
+                desc: "Walkable distance to major tech offices.",
               },
               {
-                name: "Coliving – Bellandur",
-                desc: "Furnished stay with flexible terms."
+                title: "Coliving – Bellandur",
+                desc: "Furnished stay with flexible terms.",
               },
               {
-                name: "Budget PG – Whitefield",
-                desc: "Popular with new IT joiners."
-              }
+                title: "Budget PG – Whitefield",
+                desc: "Popular among new IT joiners.",
+              },
             ].map((pg) => (
               <div
-                key={pg.name}
+                key={pg.title}
                 className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-slate-700 transition"
               >
                 <h3 className="font-semibold text-slate-100">
-                  {pg.name}
+                  {pg.title}
                 </h3>
                 <p className="mt-2 text-sm text-slate-400">
                   {pg.desc}
@@ -137,7 +143,7 @@ export default function HomePage() {
       {/* FOOTER */}
       <footer className="border-t border-slate-800">
         <div className="max-w-6xl mx-auto px-6 py-6 text-sm text-slate-500">
-          Built for Bangalore IT professionals • TechLifePortal (beta)
+          Built exclusively for Bangalore IT professionals • TechLifePortal (beta)
         </div>
       </footer>
     </main>
