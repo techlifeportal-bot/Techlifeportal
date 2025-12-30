@@ -1,86 +1,134 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { Inter } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+});
+
+const IT_HUBS = [
+  "Electronic City",
+  "Whitefield",
+  "Outer Ring Road",
+  "Bellandur",
+  "HSR Layout",
+  "Manyata Tech Park",
+];
+
 export default function HomePage() {
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState("");
+
   return (
-    <main className="homepage">
-      <section className="card-grid">
+    <main className={inter.className}>
+      {/* HERO */}
+      <section className="hero">
+        <h1>TechLifePortal</h1>
+        <p>
+          A lifestyle platform built for <strong>IT professionals</strong>.
+          Discover places, stays, and work-life essentials around Bangalore —
+          based on where you work.
+        </p>
 
-        {/* Weekend Spots */}
-        <div className="card">
-          <h3>🌴 Weekend Spots</h3>
-          <p className="card-desc">
-            Relaxed places IT professionals visit after work.
+        {/* IT HUB SELECTOR */}
+        <div className="hub-wrapper">
+          <label>Your IT hub</label>
+
+          <div
+            className="hub-select"
+            onClick={() => setOpen(!open)}
+          >
+            📍{" "}
+            {selected
+              ? selected
+              : "Select your IT hub (e.g., Electronic City)"}
+          </div>
+
+          {open && (
+            <div className="hub-dropdown">
+              {IT_HUBS.map((hub) => (
+                <div
+                  key={hub}
+                  className="hub-option"
+                  onClick={() => {
+                    setSelected(hub);
+                    setOpen(false);
+                  }}
+                >
+                  {hub}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <p className="hub-note">
+            Personalized hub-based results will unlock as the community grows.
           </p>
-          <a href="/weekend-spots" className="card-link">
-            Explore weekend spots →
-          </a>
         </div>
-
-        {/* PGs & Rentals */}
-        <div className="card">
-          <h3>🏠 PGs & Rentals</h3>
-          <p className="card-desc">
-            PGs and rentals near Bangalore tech hubs.
-          </p>
-          <a href="/pgs" className="card-link">
-            View PGs & rentals →
-          </a>
-        </div>
-
-        {/* Cafes */}
-        <div className="card">
-          <h3>☕ Cafes</h3>
-          <p className="card-desc">
-            Cafes around IT hubs for work, meetings, and breaks.
-          </p>
-          <span className="status-pill">
-            Unlocks gradually as community grows
-          </span>
-        </div>
-
-        {/* Gyms */}
-        <div className="card">
-          <h3>🏋️ Gyms</h3>
-          <p className="card-desc">
-            Gyms and fitness centers near major tech corridors.
-          </p>
-          <span className="status-pill">
-            Unlocks gradually as community grows
-          </span>
-        </div>
-
-        {/* Companies */}
-        <div className="card highlight">
-          <h3>🏢 Companies</h3>
-          <p className="card-desc">
-            IT companies and startups operating in nearby tech hubs.
-          </p>
-          <span className="status-pill">
-            Unlocks gradually as community grows
-          </span>
-        </div>
-
-        {/* IT Jobs */}
-        <div className="card">
-          <h3>💼 IT Jobs</h3>
-          <p className="card-desc">
-            Job openings from companies located in IT hubs.
-          </p>
-          <span className="status-pill">
-            Unlocks gradually as community grows
-          </span>
-        </div>
-
-        {/* AI Resume Builder */}
-        <div className="card">
-          <h3>🤖 AI Resume Builder</h3>
-          <p className="card-desc">
-            Create ATS-friendly resumes tailored for IT jobs.
-          </p>
-          <span className="status-pill">
-            Unlocks gradually as community grows
-          </span>
-        </div>
-
       </section>
+
+      {/* FEATURES */}
+      <section className="feature-grid">
+        <div className="feature-card">
+          <h2>🌴 Weekend Spots</h2>
+          <p>Relaxed places IT professionals visit after work.</p>
+          <Link href="/weekend-spots">Explore weekend spots →</Link>
+        </div>
+
+        <div className="feature-card">
+          <h2>🏠 PGs & Rentals</h2>
+          <p>PGs and rentals near Bangalore tech hubs.</p>
+          <Link href="/pgs">View PGs & rentals →</Link>
+        </div>
+
+        <div className="feature-card">
+          <h2>☕ Cafes</h2>
+          <p>Cafes around IT hubs for work, meetings, and breaks.</p>
+          <span className="badge">
+            Unlocks gradually as community grows
+          </span>
+        </div>
+
+        <div className="feature-card">
+          <h2>🏋️ Gyms</h2>
+          <p>Gyms and fitness centers near major tech corridors.</p>
+          <span className="badge">
+            Unlocks gradually as community grows
+          </span>
+        </div>
+
+        <div className="feature-card">
+          <h2>🏢 Companies</h2>
+          <p>IT companies and startups operating in nearby tech hubs.</p>
+          <span className="badge">
+            Unlocks gradually as community grows
+          </span>
+        </div>
+
+        <div className="feature-card">
+          <h2>💼 IT Jobs</h2>
+          <p>Job openings from companies located in IT hubs.</p>
+          <span className="badge">
+            Unlocks gradually as community grows
+          </span>
+        </div>
+
+        <div className="feature-card">
+          <h2>🤖 AI Resume Builder</h2>
+          <p>Create ATS-friendly resumes tailored for IT jobs.</p>
+          <span className="badge">
+            Unlocks gradually as community grows
+          </span>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer>
+        Built for Bangalore IT professionals · TechLifePortal (Beta)
+      </footer>
     </main>
   );
 }
