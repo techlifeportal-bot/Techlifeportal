@@ -5,27 +5,20 @@ export const dynamic = "force-dynamic";
 export default async function WeekendSpotsPage() {
   const { data: spots, error } = await supabase
     .from("weekend_spots")
-    .select("*")
-    .order("created_at", { ascending: false });
+    .select("id, name, location, description, maps_url, priority, status")
+    .eq("status", "active")
+    .order("priority", { ascending: false });
 
   if (error) {
-    return (
-      <main className="list-page">
-        <h1>Weekend Spots</h1>
-        <p>Failed to load weekend spots.</p>
-      </main>
-    );
+    return <p className="error-text">Failed to load weekend spots.</p>;
   }
 
   return (
     <main className="list-page">
-      <header className="list-header">
-        <h1>🌴 Weekend Spots</h1>
-        <p>
-          Short trips, walks, food streets and hangout places IT employees
-          usually visit after a busy work week.
-        </p>
-      </header>
+      <h1 className="page-title">🌴 Weekend Spots</h1>
+      <p className="page-subtitle">
+        Curated weekend places loved by Bangalore IT professionals.
+      </p>
 
       <section className="card-grid">
         {spots && spots.length > 0 ? (
@@ -33,27 +26,39 @@ export default async function WeekendSpotsPage() {
             <div key={spot.id} className="card">
               <h3>{spot.name}</h3>
 
-              <p className="card-desc">{spot.description}</p>
+              {spot.location && (
+                <p className="meta">📍 {spot.location}</p>
+              )}
 
-              <div className="card-meta">
-                <span>📍 {spot.location}</span>
-                <span>🏷️ {spot.category}</span>
-              </div>
+              {spot.description && (
+                <p className="description">{spot.description}</p>
+              )}
 
-              {spot.map_url && (
+              {spot.maps_url ? (
                 <a
-                  href={spot.map_url}
+                  href={spot.maps_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="map-link"
+                  className="card-link"
                 >
-                  Open in Maps →
+                  📍 Open in Google Maps →
                 </a>
-              )}
+              ) : spot.location ? (
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    spot.location
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="card-link"
+                >
+                  📍 Search on Google Maps →
+                </a>
+              ) : null}
             </div>
           ))
         ) : (
-          <p>No weekend spots added yet.</p>
+          <p>No weekend spots available yet.</p>
         )}
       </section>
     </main>
