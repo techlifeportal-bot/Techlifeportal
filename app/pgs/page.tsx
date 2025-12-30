@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 const IT_HUBS = [
-  { label: "Electronic City", value: "electronic-city" },
+  { label: "Electronic City", value: "electronic city" },
   { label: "Whitefield", value: "whitefield" },
-  { label: "Outer Ring Road", value: "outer-ring-road" },
+  { label: "Outer Ring Road", value: "outer ring road" },
   { label: "Bellandur", value: "bellandur" },
-  { label: "HSR Layout", value: "hsr-layout" },
-  { label: "Manyata Tech Park", value: "manyata-tech-park" },
+  { label: "HSR Layout", value: "hsr layout" },
+  { label: "Manyata Tech Park", value: "manyata tech park" },
 ];
 
 const supabase = createClient(
@@ -31,7 +31,7 @@ export default function PGsPage() {
       const { data, error } = await supabase
         .from("pgs_rentals")
         .select("*")
-        .eq("hub", selectedHub);
+        .ilike("hub", selectedHub);
 
       if (error) {
         console.error(error);
@@ -89,12 +89,8 @@ export default function PGsPage() {
           <div key={pg.id} className="hub-card">
             <h3>{pg.name}</h3>
 
-            {pg.address && (
-              <p className="hub-address">{pg.address}</p>
-            )}
-
-            {pg.rent && (
-              <p className="hub-rent">Rent: ₹{pg.rent}</p>
+            {pg.description && (
+              <p className="hub-address">{pg.description}</p>
             )}
           </div>
         ))}
