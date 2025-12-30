@@ -1,62 +1,72 @@
+// app/pgs/page.tsx
 import { supabase } from "@/lib/supabaseClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function PGsPage() {
+  // Fetch PGs from Supabase
   const { data: pgs, error } = await supabase
-    .from("pgs")
+    .from("pgs_rentals") // ✅ correct table name
     .select("*")
     .order("created_at", { ascending: false });
 
+  // Error state
   if (error) {
+    console.error("Error loading PGs:", error.message);
     return (
-      <div className="container">
-        <h1>PGs & Rentals</h1>
-        <p>Failed to load PG listings.</p>
-      </div>
+      <main className="page">
+        <h1 className="page-title">🏠 PGs & Rentals</h1>
+        <p className="error-text">Failed to load PG listings.</p>
+      </main>
+    );
+  }
+
+  // Empty state
+  if (!pgs || pgs.length === 0) {
+    return (
+      <main className="page">
+        <h1 className="page-title">🏠 PGs & Rentals</h1>
+        <p className="page-subtitle">
+          Affordable PGs and rental stays near Bangalore tech hubs.
+        </p>
+        <p className="empty-text">No PGs available yet.</p>
+      </main>
     );
   }
 
   return (
-    <div className="container">
-      {/* Page header */}
-      <header className="list-header">
-        <h1>🏠 PGs & Rentals</h1>
-        <p>
-          PGs and rental stays near Bangalore tech hubs — useful for freshers
-          and working professionals.
-        </p>
-      </header>
+    <main className="page">
+      <h1 className="page-title">🏠 PGs & Rentals</h1>
+      <p className="page-subtitle">
+        Affordable PGs and rental stays near Bangalore tech hubs.
+      </p>
 
-      {/* Cards */}
       <section className="card-grid">
-        {pgs && pgs.length > 0 ? (
-          pgs.map((pg) => (
-            <div key={pg.id} className="card">
-              <h3>{pg.name}</h3>
+        {pgs.map((pg: any) => (
+          <div key={pg.id} className="card">
+            <h3 className="card-title">{pg.name}</h3>
 
-              <p className="meta">
-                📍 {pg.area} · 💰 {pg.price_range}
-              </p>
+            <p className="card-meta">
+              📍 {pg.location} · 💰 {pg.price_range || "Price not listed"}
+            </p>
 
-              <p>{pg.description}</p>
+            {pg.description && (
+              <p className="card-description">{pg.description}</p>
+            )}
 
-              {pg.maps_url && (
-                <a
-                  href={pg.maps_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="card-link"
-                >
-                  Open in Maps →
-                </a>
-              )}
-            </div>
-          ))
-        ) : (
-          <p>No PGs added yet.</p>
-        )}
+            {pg.google_maps_url && (
+              <a
+                href={pg.google_maps_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="card-link"
+              >
+                View on Google Maps →
+              </a>
+            )}
+          </div>
+        ))}
       </section>
-    </div>
+    </main>
   );
 }
