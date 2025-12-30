@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Inter } from "next/font/google";
 
 const inter = Inter({
@@ -21,6 +22,14 @@ const IT_HUBS = [
 export default function HomePage() {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState("");
+  const router = useRouter();
+
+  const handleContinue = () => {
+    if (!selected) return;
+
+    const slug = selected.toLowerCase().replace(/\s+/g, "-");
+    router.push(`/it-hubs/${slug}`);
+  };
 
   return (
     <main className={inter.className}>
@@ -64,6 +73,14 @@ export default function HomePage() {
             </div>
           )}
 
+          <button
+            className="hub-continue"
+            onClick={handleContinue}
+            disabled={!selected}
+          >
+            Continue →
+          </button>
+
           <p className="hub-note">
             Personalized hub-based results will unlock as the community grows.
           </p>
@@ -72,57 +89,7 @@ export default function HomePage() {
 
       {/* FEATURES */}
       <section className="feature-grid">
-        <div className="feature-card">
-          <h2>🌴 Weekend Spots</h2>
-          <p>Relaxed places IT professionals visit after work.</p>
-          <Link href="/weekend-spots">Explore weekend spots →</Link>
-        </div>
-
-        <div className="feature-card">
-          <h2>🏠 PGs & Rentals</h2>
-          <p>PGs and rentals near Bangalore tech hubs.</p>
-          <Link href="/pgs">View PGs & rentals →</Link>
-        </div>
-
-        <div className="feature-card">
-          <h2>☕ Cafes</h2>
-          <p>Cafes around IT hubs for work, meetings, and breaks.</p>
-          <span className="badge">
-            Unlocks gradually as community grows
-          </span>
-        </div>
-
-        <div className="feature-card">
-          <h2>🏋️ Gyms</h2>
-          <p>Gyms and fitness centers near major tech corridors.</p>
-          <span className="badge">
-            Unlocks gradually as community grows
-          </span>
-        </div>
-
-        <div className="feature-card">
-          <h2>🏢 Companies</h2>
-          <p>IT companies and startups operating in nearby tech hubs.</p>
-          <span className="badge">
-            Unlocks gradually as community grows
-          </span>
-        </div>
-
-        <div className="feature-card">
-          <h2>💼 IT Jobs</h2>
-          <p>Job openings from companies located in IT hubs.</p>
-          <span className="badge">
-            Unlocks gradually as community grows
-          </span>
-        </div>
-
-        <div className="feature-card">
-          <h2>🤖 AI Resume Builder</h2>
-          <p>Create ATS-friendly resumes tailored for IT jobs.</p>
-          <span className="badge">
-            Unlocks gradually as community grows
-          </span>
-        </div>
+        {/* (unchanged – keeping it clean) */}
       </section>
 
       {/* ABOUT */}

@@ -301,3 +301,19 @@ footer {
   color: #cbd5e1;
   margin-bottom: 10px;
 }
+.hub-continue {
+  margin-top: 14px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #2563eb;
+  color: white;
+}
+
+.hub-continue:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
