@@ -9,7 +9,7 @@ export default async function WeekendSpotsPage() {
   const { data: spots, error } = await supabase
     .from("weekend_spots")
     .select("*")
-    .eq("status", "approved")
+    .eq("*")
     .order("created_at", { ascending: false });
 
   if (error) {
