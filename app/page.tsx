@@ -22,7 +22,7 @@ export default function HomePage() {
           maxWidth: "900px",
           margin: "0 auto",
           paddingTop: "3.5rem",
-          paddingBottom: "2rem",
+          paddingBottom: "1.5rem",
         }}
       >
         <h1>TechLifePortal</h1>
@@ -33,7 +33,7 @@ export default function HomePage() {
         </p>
       </section>
 
-      {/* IT HUB SELECTOR (UI ONLY) */}
+      {/* IT HUB SEARCH (UI ONLY) */}
       <section
         style={{
           maxWidth: "900px",
@@ -41,48 +41,78 @@ export default function HomePage() {
           paddingBottom: "2.5rem",
         }}
       >
-        <h2 style={{ marginBottom: "0.8rem" }}>Select your IT hub</h2>
+        <label
+          style={{
+            fontSize: "0.9rem",
+            opacity: 0.85,
+            display: "block",
+            marginBottom: "0.4rem",
+          }}
+        >
+          Your IT hub
+        </label>
 
         <div
           style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "0.75rem",
+            position: "relative",
+            maxWidth: "420px",
           }}
         >
-          {[
-            "Electronic City",
-            "Whitefield",
-            "Outer Ring Road",
-            "Bellandur",
-            "HSR Layout",
-            "Manyata Tech Park",
-          ].map((hub) => (
-            <span
-              key={hub}
-              style={{
-                padding: "0.45rem 0.9rem",
-                borderRadius: "999px",
-                border: "1px solid rgba(255,255,255,0.15)",
-                fontSize: "0.85rem",
-                cursor: "default",
-                opacity: 0.85,
-              }}
-            >
-              {hub}
-            </span>
-          ))}
+          {/* Fake input */}
+          <div
+            style={{
+              padding: "0.7rem 0.9rem",
+              borderRadius: "10px",
+              border: "1px solid rgba(255,255,255,0.15)",
+              background: "rgba(255,255,255,0.04)",
+              fontSize: "0.9rem",
+              cursor: "pointer",
+            }}
+          >
+            📍 Select your IT hub (e.g., Electronic City)
+          </div>
+
+          {/* Dropdown (static UI) */}
+          <div
+            style={{
+              marginTop: "0.4rem",
+              borderRadius: "10px",
+              border: "1px solid rgba(255,255,255,0.12)",
+              background: "rgba(10,15,30,0.95)",
+              padding: "0.3rem 0",
+              maxWidth: "420px",
+            }}
+          >
+            {[
+              "Electronic City",
+              "Whitefield",
+              "Outer Ring Road",
+              "Bellandur",
+              "HSR Layout",
+              "Manyata Tech Park",
+            ].map((hub) => (
+              <div
+                key={hub}
+                style={{
+                  padding: "0.55rem 0.9rem",
+                  fontSize: "0.85rem",
+                  opacity: 0.9,
+                }}
+              >
+                {hub}
+              </div>
+            ))}
+          </div>
         </div>
 
         <p
           style={{
-            marginTop: "0.6rem",
-            fontSize: "0.85rem",
-            opacity: 0.65,
+            marginTop: "0.5rem",
+            fontSize: "0.8rem",
+            opacity: 0.6,
           }}
         >
-          Currently showing content from all hubs. Personalized hub view will
-          unlock as the community grows.
+          Personalized hub-based results will unlock as the community grows.
         </p>
       </section>
 
