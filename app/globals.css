@@ -200,3 +200,59 @@ footer {
     padding: 2.2rem 1.2rem;
   }
 }
+/* ================================
+   IT HUB SELECTOR (Homepage)
+   ================================ */
+
+.hub-wrapper {
+  margin-top: 24px;
+  max-width: 420px;
+}
+
+.hub-wrapper label {
+  display: block;
+  margin-bottom: 6px;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.hub-select {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.hub-select:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.hub-dropdown {
+  margin-top: 8px;
+  background: #020617;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+.hub-option {
+  padding: 12px 14px;
+  cursor: pointer;
+  color: #e5e7eb;
+  font-size: 0.95rem;
+}
+
+.hub-option:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.hub-note {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
