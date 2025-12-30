@@ -10,42 +10,55 @@ export default async function WeekendSpotsPage() {
     .order("priority", { ascending: false });
 
   if (error) {
-    console.error(error);
-    return <p className="error-text">Failed to load weekend spots.</p>;
+    return <p>Failed to load weekend spots.</p>;
   }
 
   return (
     <main className="list-page">
-      <h1 className="page-title">🌴 Weekend Spots</h1>
-      <p className="page-subtitle">
-        Handpicked weekend getaways and hangout places for Bangalore IT professionals.
+      <h1>🌴 Weekend Spots</h1>
+      <p>
+        Handpicked weekend getaways and hangout places for Bangalore IT
+        professionals.
       </p>
+
+      {/* Scoped styles — affects ONLY this page */}
+      <style>{`
+        .weekend-card {
+          border-radius: 14px;
+          padding: 20px;
+          background: rgba(255, 255, 255, 0.04);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .weekend-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .weekend-card h3 {
+          margin-bottom: 6px;
+        }
+
+        .weekend-card a {
+          display: inline-block;
+          margin-top: 10px;
+          font-weight: 500;
+        }
+      `}</style>
 
       <section className="card-grid">
         {spots && spots.length > 0 ? (
           spots.map((spot) => (
-            <div key={spot.id} className="card">
+            <div key={spot.id} className="weekend-card">
               <h3>{spot.location}</h3>
 
-              {spot.maps_url ? (
+              {spot.maps_url && (
                 <a
                   href={spot.maps_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="card-link"
                 >
                   📍 Open in Google Maps →
-                </a>
-              ) : (
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                    spot.location
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="card-link"
-                >
-                  📍 Search on Google Maps →
                 </a>
               )}
             </div>
