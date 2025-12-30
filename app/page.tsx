@@ -1,122 +1,103 @@
+import Image from "next/image";
+import Link from "next/link";
+
 export const metadata = {
   title: "TechLifePortal – For Bangalore IT Professionals",
   description:
-    "TechLifePortal helps Bangalore IT professionals discover weekend spots and PG stays near major tech hubs. Built for tech life.",
+    "TechLifePortal helps Bangalore IT professionals discover weekend spots, PGs & rentals near tech hubs.",
 };
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-white text-slate-900">
-      
+    <main className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-slate-100">
       {/* HERO */}
-      <section className="max-w-6xl mx-auto px-6 pt-20 pb-16 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900">
+      <section className="max-w-6xl mx-auto px-6 py-20 text-center">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <Image
+            src="/logo.svg"
+            alt="TechLifePortal logo"
+            width={72}
+            height={72}
+            priority
+          />
+        </div>
+
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
           TechLifePortal
         </h1>
 
-        <p className="mt-4 text-lg text-slate-700 max-w-2xl mx-auto">
-          A lifestyle portal built <strong>for Bangalore IT professionals</strong>.
-          Discover weekend spots and PGs near tech hubs — simple, focused and useful.
+        <p className="mt-4 text-lg text-slate-300 max-w-2xl mx-auto">
+          A lifestyle guide built for{" "}
+          <span className="text-blue-400 font-medium">
+            Bangalore IT professionals
+          </span>
+          . Discover weekend spots and PGs near tech hubs — curated for tech
+          life.
         </p>
 
-        <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-1 text-sm text-blue-700">
-          🚀 Soft Launch • Bangalore IT Community
+        <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-blue-600/20 px-4 py-2 text-sm text-blue-300 border border-blue-500/30">
+          🚀 Soft Launch · Bangalore IT Community
         </div>
       </section>
 
-      {/* CORE FEATURES */}
-      <section className="max-w-6xl mx-auto px-6 pb-20">
-        <h2 className="text-2xl font-semibold mb-6">
-          What you can explore now
-        </h2>
+      {/* PRIMARY FEATURES */}
+      <section className="max-w-6xl mx-auto px-6 pb-20 grid gap-6 md:grid-cols-2">
+        {/* Weekend Spots */}
+        <div className="rounded-2xl bg-slate-800/70 border border-slate-700 p-6 hover:border-blue-500/40 transition">
+          <h2 className="text-xl font-semibold flex items-center gap-2">
+            🌴 Weekend Spots
+          </h2>
+          <p className="mt-2 text-slate-300">
+            Short trips, walks, food streets and hangout places IT employees
+            usually visit after a busy work week.
+          </p>
+          <Link
+            href="/weekend-spots"
+            className="inline-block mt-4 text-blue-400 hover:text-blue-300 font-medium"
+          >
+            Explore weekend spots →
+          </Link>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Weekend Spots */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 hover:shadow-md transition">
-            <h3 className="text-xl font-semibold mb-2">
-              🌴 Weekend Spots
-            </h3>
-            <p className="text-slate-600 mb-4">
-              Curated hangout places, walks and short trips Bangalore IT employees
-              usually visit after a busy work week.
-            </p>
-            <a
-              href="/weekend-spots"
-              className="inline-block text-blue-600 font-medium hover:underline"
-            >
-              Explore weekend spots →
-            </a>
-          </div>
-
-          {/* PGs */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 hover:shadow-md transition">
-            <h3 className="text-xl font-semibold mb-2">
-              🏠 PGs & Rentals
-            </h3>
-            <p className="text-slate-600 mb-4">
-              PGs and rental stays near Bangalore tech hubs —
-              helpful for freshers and working professionals.
-            </p>
-            <a
-              href="/pgs"
-              className="inline-block text-blue-600 font-medium hover:underline"
-            >
-              View PGs & rentals →
-            </a>
-          </div>
+        {/* PGs */}
+        <div className="rounded-2xl bg-slate-800/70 border border-slate-700 p-6 hover:border-blue-500/40 transition">
+          <h2 className="text-xl font-semibold flex items-center gap-2">
+            🏠 PGs & Rentals
+          </h2>
+          <p className="mt-2 text-slate-300">
+            PGs and rental stays near Bangalore tech hubs — useful for freshers
+            and working professionals.
+          </p>
+          <Link
+            href="/pgs"
+            className="inline-block mt-4 text-blue-400 hover:text-blue-300 font-medium"
+          >
+            View PGs & rentals →
+          </Link>
         </div>
       </section>
 
       {/* COMING SOON */}
-      <section className="max-w-6xl mx-auto px-6 pb-20">
-        <h2 className="text-2xl font-semibold mb-6">
-          Coming soon
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[
-            "📄 AI Resume Builder",
-            "☕ Cafés near tech hubs",
-            "🏋️ Gyms & fitness",
-            "🏢 Nearby companies",
-            "💼 IT Jobs",
-          ].map((feature) => (
-            <div
-              key={feature}
-              className="rounded-xl border border-dashed border-slate-300 bg-blue-50 p-5 text-slate-600"
-            >
-              <p className="font-medium">{feature}</p>
-              <p className="text-sm mt-1">
-                Coming soon for the Bangalore IT community.
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ABOUT SECTION */}
-      <section className="bg-slate-50 border-t border-slate-200">
-        <div className="max-w-6xl mx-auto px-6 py-16">
-          <h2 className="text-2xl font-semibold mb-4">
-            About TechLifePortal
-          </h2>
-
-          <p className="text-slate-700 max-w-3xl leading-relaxed">
-            TechLifePortal is built exclusively for IT professionals working in
-            Bangalore. The goal is simple — make tech life outside work easier
-            and more enjoyable.
-            <br /><br />
-            From discovering weekend spots to finding PGs near tech hubs, the
-            platform focuses on practical, curated information instead of noise.
-            More features like resume tools, cafés, gyms and jobs will be added
-            gradually based on real community needs.
+      <section className="max-w-4xl mx-auto px-6 pb-20 text-center">
+        <div className="rounded-2xl border border-dashed border-slate-600 p-8 bg-slate-800/40">
+          <h3 className="text-lg font-semibold">More features coming soon</h3>
+          <p className="mt-2 text-slate-400">
+            AI Resume Builder, Cafés, Gyms, Nearby Companies and IT Jobs will be
+            unlocked gradually as the community grows.
           </p>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="border-t border-slate-200 py-6 text-center text-sm text-slate-500 bg-white">
-        Built with ❤️ in Bangalore • TechLifePortal (Beta)
+      {/* ABOUT */}
+      <footer className="border-t border-slate-800 py-10 text-center text-sm text-slate-400">
+        <p>
+          Built for Bangalore IT employees · Powered by AI · TechLifePortal
+          (beta)
+        </p>
+        <p className="mt-1">
+          Founder: KB · Always verify details before making decisions
+        </p>
       </footer>
     </main>
   );
