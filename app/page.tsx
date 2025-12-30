@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Inter } from "next/font/google";
 
 const inter = Inter({
@@ -10,26 +8,7 @@ const inter = Inter({
   weight: ["400", "500", "600"],
 });
 
-const IT_HUBS = [
-  "Electronic City",
-  "Whitefield",
-  "Outer Ring Road",
-  "Bellandur",
-  "HSR Layout",
-  "Manyata Tech Park",
-];
-
 export default function HomePage() {
-  const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState("");
-  const router = useRouter();
-
-  const handleContinue = () => {
-    if (!selected) return;
-    const slug = selected.toLowerCase().replace(/\s+/g, "-");
-    router.push(`/it-hubs/${slug}`);
-  };
-
   return (
     <main className={inter.className}>
       {/* HERO */}
@@ -40,53 +19,9 @@ export default function HomePage() {
           Discover places, stays, and work-life essentials around Bangalore —
           based on where you work.
         </p>
-
-        {/* IT HUB SELECTOR */}
-        <div className="hub-wrapper">
-          <label>Your IT hub</label>
-
-          <div
-            className="hub-select"
-            onClick={() => setOpen(!open)}
-          >
-            📍{" "}
-            {selected
-              ? selected
-              : "Select your IT hub (e.g., Electronic City)"}
-          </div>
-
-          {open && (
-            <div className="hub-dropdown">
-              {IT_HUBS.map((hub) => (
-                <div
-                  key={hub}
-                  className="hub-option"
-                  onClick={() => {
-                    setSelected(hub);
-                    setOpen(false);
-                  }}
-                >
-                  {hub}
-                </div>
-              ))}
-            </div>
-          )}
-
-          <button
-            className="hub-continue"
-            onClick={handleContinue}
-            disabled={!selected}
-          >
-            Continue →
-          </button>
-
-          <p className="hub-note">
-            Personalized hub-based results will unlock as the community grows.
-          </p>
-        </div>
       </section>
 
-      {/* FEATURES (RESTORED) */}
+      {/* FEATURES */}
       <section className="feature-grid">
         <div className="feature-card">
           <h2>🌴 Weekend Spots</h2>
@@ -103,31 +38,41 @@ export default function HomePage() {
         <div className="feature-card">
           <h2>☕ Cafes</h2>
           <p>Cafes around IT hubs for work, meetings, and breaks.</p>
-          <span className="badge">Unlocks gradually as community grows</span>
+          <span className="badge">
+            Unlocks gradually as community grows
+          </span>
         </div>
 
         <div className="feature-card">
           <h2>🏋️ Gyms</h2>
           <p>Gyms and fitness centers near major tech corridors.</p>
-          <span className="badge">Unlocks gradually as community grows</span>
+          <span className="badge">
+            Unlocks gradually as community grows
+          </span>
         </div>
 
         <div className="feature-card">
           <h2>🏢 Companies</h2>
           <p>IT companies and startups operating in nearby tech hubs.</p>
-          <span className="badge">Unlocks gradually as community grows</span>
+          <span className="badge">
+            Unlocks gradually as community grows
+          </span>
         </div>
 
         <div className="feature-card">
           <h2>💼 IT Jobs</h2>
           <p>Job openings from companies located in IT hubs.</p>
-          <span className="badge">Unlocks gradually as community grows</span>
+          <span className="badge">
+            Unlocks gradually as community grows
+          </span>
         </div>
 
         <div className="feature-card">
           <h2>🤖 AI Resume Builder</h2>
           <p>Create ATS-friendly resumes tailored for IT jobs.</p>
-          <span className="badge">Unlocks gradually as community grows</span>
+          <span className="badge">
+            Unlocks gradually as community grows
+          </span>
         </div>
       </section>
 
