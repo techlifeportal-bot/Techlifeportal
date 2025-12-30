@@ -1,181 +1,130 @@
-import { createClient } from '@supabase/supabase-js';
-
-export const dynamic = 'force-dynamic';
+import { createClient } from '@supabase/supabase-js'
+import Link from 'next/link'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-type WeekendSpot = {
-  id?: number;
-  Name: string;
-  description?: string;
-  ai_summary?: string;
-  hub?: string;
-  category?: string;
-};
-
-/* ----------------------------------------
-   Highlighting (Phase 3A)
------------------------------------------ */
-const HIGHLIGHT_REGEX =
-  /\b(sunrise|trek|nature|hill|mall|food court|movies?|hangout|weekend|getaway|it employees?|crowd|scenic|ride)\b/gi;
-
-function highlightText(text: string) {
-  return text.split(HIGHLIGHT_REGEX).map((part, index) =>
-    HIGHLIGHT_REGEX.test(part) ? (
-      <span key={index} className="bg-yellow-100 px-1 rounded">
-        {part}
-      </span>
-    ) : (
-      <span key={index}>{part}</span>
-    )
-  );
-}
-
-/* ----------------------------------------
-   Phase 3B — Task 3: AI draft generator
------------------------------------------ */
-function generateDraftSpots(existing: WeekendSpot[]): WeekendSpot[] {
-  const hubs = existing.map((s) => s.hub?.toLowerCase());
-  const drafts: WeekendSpot[] = [];
-
-  if (!hubs.includes('whitefield')) {
-    drafts.push({
-      Name: 'Whitefield Tech Park Food Street',
-      hub: 'Whitefield',
-      category: 'Food / Hangout',
-      description:
-        'Popular evening food street near tech parks in Whitefield, ideal for weekend outings with colleagues and friends.',
-      ai_summary:
-        'A lively food street near Whitefield IT hubs offering diverse street food, casual dining, and a relaxed weekend vibe for tech employees.'
-    });
-  }
-
-  if (!hubs.includes('jp nagar')) {
-    drafts.push({
-      Name: 'JP Nagar Mini Forest Walk',
-      hub: 'JP Nagar',
-      category: 'Nature / Walk',
-      description:
-        'A peaceful walking trail surrounded by greenery, suitable for calm weekend mornings.',
-      ai_summary:
-        'A quiet nature escape within the city, ideal for slow weekend walks, fresh air, and short breaks from urban noise.'
-    });
-  }
-
-  if (!existing.some((s) => /lake/i.test(s.category || ''))) {
-    drafts.push({
-      Name: 'Agara Lake Evening Walk',
-      hub: 'HSR / Bellandur',
-      category: 'Leisure / Walk',
-      description:
-        'Well-maintained lake with walking paths, popular for sunset views and relaxed weekends.',
-      ai_summary:
-        'Agara Lake offers calm walking trails and scenic sunsets, making it a perfect low-effort weekend destination near IT corridors.'
-    });
-  }
-
-  return drafts;
-}
+)
 
 export default async function HomePage() {
-  const { data: weekendSpots, error } = await supabase
+  // Fetch approved weekend spots (limit for homepage)
+  const { data: weekendSpots } = await supabase
     .from('weekend_spots')
-    .select('*');
+    .select('id, name, description')
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false })
+    .limit(6)
 
-  if (error) {
-    return (
-      <main className="min-h-screen flex items-center justify-center">
-        <p className="text-red-600 font-semibold">
-          Error loading weekend spots
-        </p>
-      </main>
-    );
-  }
-
-  const spots = weekendSpots as WeekendSpot[];
-  const draftSpots = generateDraftSpots(spots);
+  // Fetch PGs (if table exists & has data)
+  const { data: pgs } = await supabase
+    .from('pg_rentals')
+    .select('id, name, location, rent')
+    .eq('status', 'approved')
+    .limit(4)
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-10">
-      <h1 className="text-3xl font-bold text-center mb-10">
-        Weekend Spots
-      </h1>
+    <main className="max-w-6xl mx-auto px-4 py-10 space-y-20">
 
-      {/* =======================
-          AI Draft Suggestions
-         ======================= */}
-      <div className="max-w-4xl mx-auto mb-12 bg-green-50 border border-green-200 rounded-xl p-5">
-        <h2 className="text-lg font-semibold mb-3">
-          🤖 AI-Suggested New Weekend Spots (Draft)
-        </h2>
+      {/* HERO SECTION */}
+      <section className="text-center space-y-6">
+        <h1 className="text-4xl md:text-5xl font-bold">
+          TechLifePortal
+        </h1>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          Smart weekend getaways and PGs curated for IT professionals around Bangalore.
+        </p>
 
-        {draftSpots.length === 0 ? (
-          <p className="text-sm text-green-900">
-            No new suggestions right now. Coverage looks good.
-          </p>
-        ) : (
-          <div className="space-y-4">
-            {draftSpots.map((spot, index) => (
+        <div className="flex justify-center gap-4">
+          <Link
+            href="/weekend-spots"
+            className="px-6 py-3 bg-black text-white rounded-lg"
+          >
+            Explore Weekend Spots
+          </Link>
+          <Link
+            href="/pgs"
+            className="px-6 py-3 border border-black rounded-lg"
+          >
+            Find PGs
+          </Link>
+        </div>
+      </section>
+
+      {/* WEEKEND SPOTS PREVIEW */}
+      <section className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold">Weekend Spots</h2>
+          <Link href="/weekend-spots" className="text-sm underline">
+            View all →
+          </Link>
+        </div>
+
+        {weekendSpots && weekendSpots.length > 0 ? (
+          <div className="grid md:grid-cols-3 gap-6">
+            {weekendSpots.map((spot) => (
               <div
-                key={index}
-                className="bg-white border rounded-lg p-4"
+                key={spot.id}
+                className="border rounded-lg p-4 space-y-2"
               >
-                <p className="font-semibold">{spot.Name}</p>
-                <p className="text-sm text-gray-600 mt-1">
-                  📍 {spot.hub} · 🏷️ {spot.category}
-                </p>
-                <p className="text-sm text-gray-700 mt-2">
-                  {highlightText(spot.description || '')}
-                </p>
-                <p className="text-xs text-green-700 mt-2">
-                  🤖 AI draft — not published
+                <h3 className="font-semibold text-lg">{spot.name}</h3>
+                <p className="text-sm text-gray-600">
+                  {spot.description?.slice(0, 120)}...
                 </p>
               </div>
             ))}
           </div>
+        ) : (
+          <p className="text-gray-500">
+            Weekend spots will appear here soon.
+          </p>
         )}
-      </div>
+      </section>
 
-      {/* =======================
-          Existing Weekend Spots
-         ======================= */}
-      <div className="max-w-4xl mx-auto space-y-6">
-        {spots.map((spot) => (
-          <div
-            key={spot.id}
-            className="bg-white border rounded-xl p-6 shadow-sm"
-          >
-            <h2 className="text-xl font-bold mb-2">
-              {spot.Name}
-            </h2>
+      {/* PG SECTION (B1 LOGIC) */}
+      <section className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold">PGs for IT Professionals</h2>
+          <Link href="/pgs" className="text-sm underline">
+            View all →
+          </Link>
+        </div>
 
-            {spot.description && (
-              <p className="text-gray-700 mb-3">
-                {highlightText(spot.description)}
-              </p>
-            )}
-
-            {spot.ai_summary && (
-              <details className="mt-3">
-                <summary className="cursor-pointer text-sm text-blue-600 font-medium">
-                  🤖 View AI summary
-                </summary>
-                <div className="mt-2 text-sm text-gray-600 whitespace-pre-line">
-                  {highlightText(spot.ai_summary)}
-                </div>
-              </details>
-            )}
-
-            <div className="mt-3 text-sm text-gray-500">
-              {spot.hub && <>📍 {spot.hub}</>}
-              {spot.category && <> · 🏷️ {spot.category}</>}
-            </div>
+        {pgs && pgs.length > 0 ? (
+          <div className="grid md:grid-cols-2 gap-6">
+            {pgs.map((pg) => (
+              <div
+                key={pg.id}
+                className="border rounded-lg p-4 space-y-1"
+              >
+                <h3 className="font-semibold">{pg.name}</h3>
+                <p className="text-sm text-gray-600">
+                  {pg.location} • ₹{pg.rent}/month
+                </p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        ) : (
+          <div className="border rounded-lg p-6 text-gray-500">
+            PG listings coming soon. We’re curating quality stays near IT hubs.
+          </div>
+        )}
+      </section>
+
+      {/* TRUST SECTION */}
+      <section className="text-center space-y-3">
+        <p className="font-medium">
+          Curated with AI. Reviewed by humans.
+        </p>
+        <p className="text-sm text-gray-600">
+          Built specifically for IT professionals who value time, clarity, and trust.
+        </p>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t pt-6 text-center text-sm text-gray-500">
+        © {new Date().getFullYear()} TechLifePortal · About · Contact
+      </footer>
+
     </main>
-  );
+  )
 }
