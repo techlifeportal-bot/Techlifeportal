@@ -1,172 +1,84 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { NextResponse } from "next/server";
+import OpenAI from "openai";
 import { createClient } from "@supabase/supabase-js";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
+});
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-type Draft = {
-  id: string;
-  name: string;
-  description: string;
-  location: string;
-  category: string;
-};
+export async function POST(req: Request) {
+  try {
+    const { type } = await req.json();
 
-const AI_TYPES = [
-  { label: "Weekend Spots", value: "weekend_spots" },
-  { label: "Cafes", value: "cafes" },
-  { label: "Gyms", value: "gyms" },
-  { label: "Companies", value: "companies" },
-  { label: "Jobs", value: "jobs" },
-];
-
-export default function AdminPage() {
-  const [drafts, setDrafts] = useState<Draft[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
-  const [selectedType, setSelectedType] = useState("");
-
-  useEffect(() => {
-    fetchDrafts();
-  }, []);
-
-  const fetchDrafts = async () => {
-    const { data, error } = await supabase
-      .from("ai_suggested_spots")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (!error) {
-      setDrafts(data || []);
-    } else {
-      console.error(error);
+    if (!type) {
+      return NextResponse.json(
+        { error: "Missing suggestion type" },
+        { status: 400 }
+      );
     }
 
-    setLoading(false);
-  };
+    const promptMap: Record<string, string> = {
+      weekend_spots:
+        "Suggest 3 Bangalore weekend spots for IT professionals.",
+      cafes:
+        "Suggest 3 cafes in Bangalore popular among IT professionals.",
+      gyms:
+        "Suggest 3 gyms in Bangalore near IT hubs.",
+      companies:
+        "Suggest 3 IT companies in Bangalore.",
+      jobs:
+        "Suggest 3 IT job roles currently popular in Bangalore.",
+    };
 
-  const generateAISuggestions = async () => {
-    if (!selectedType) {
-      alert("Select AI suggestion type first");
-      return;
+    const prompt = promptMap[type];
+    if (!prompt) {
+      return NextResponse.json(
+        { error: "Invalid suggestion type" },
+        { status: 400 }
+      );
     }
 
-    setGenerating(true);
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Return STRICT JSON array. Each item must have name, description, location.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.6,
+    });
 
-    try {
-      const res = await fetch("/api/ai/suggest", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: selectedType }),
+    const content = completion.choices[0].message.content;
+    if (!content) throw new Error("Empty AI response");
+
+    const items = JSON.parse(content);
+
+    for (const item of items) {
+      await supabase.from("ai_suggested_spots").insert({
+        name: item.name,
+        description: item.description,
+        location: item.location,
+        category: type,
       });
-
-      if (!res.ok) throw new Error();
-
-      await fetchDrafts();
-    } catch {
-      alert("Failed to generate AI suggestions");
     }
 
-    setGenerating(false);
-  };
-
-  const approveDraft = async (draft: Draft) => {
-    const { error } = await supabase
-      .from(draft.category)
-      .insert({
-        name: draft.name,
-        description: draft.description,
-        location: draft.location,
-      });
-
-    if (error) {
-      alert("Failed to approve");
-      return;
-    }
-
-    await supabase
-      .from("ai_suggested_spots")
-      .delete()
-      .eq("id", draft.id);
-
-    fetchDrafts();
-  };
-
-  return (
-    <main className="admin-page">
-      <header className="admin-header">
-        <h1>Admin — AI Draft Review</h1>
-        <p>
-          Automation status: <strong>MANUAL ONLY</strong>
-        </p>
-
-        <div className="admin-ai-control">
-          <select
-            value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value)}
-          >
-            <option value="">Select AI suggestion type</option>
-            {AI_TYPES.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </select>
-
-          <button
-            className="generate-btn"
-            onClick={generateAISuggestions}
-            disabled={generating}
-          >
-            {generating ? "Generating…" : "Generate AI Suggestions"}
-          </button>
-        </div>
-      </header>
-
-      {loading && <p>Loading AI drafts…</p>}
-
-      {!loading && drafts.length === 0 && (
-        <p>No AI drafts pending review.</p>
-      )}
-
-      <section className="admin-grid">
-        {drafts.map((draft) => (
-          <div key={draft.id} className="admin-card">
-            <div className="admin-card-header">
-              <h3>{draft.name}</h3>
-              <span className="admin-status">
-                {draft.category.replace("_", " ")}
-              </span>
-            </div>
-
-            <label>Description</label>
-            <textarea value={draft.description} rows={4} readOnly />
-
-            <div className="admin-row">
-              <div>
-                <label>Location</label>
-                <input value={draft.location} readOnly />
-              </div>
-
-              <div>
-                <label>Category</label>
-                <input value={draft.category} readOnly />
-              </div>
-            </div>
-
-            <button
-              className="approve-btn"
-              onClick={() => approveDraft(draft)}
-            >
-              Approve
-            </button>
-          </div>
-        ))}
-      </section>
-    </main>
-  );
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("AI suggest error:", error);
+    return NextResponse.json(
+      { error: "AI generation failed" },
+      { status: 500 }
+    );
+  }
 }
