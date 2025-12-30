@@ -19,6 +19,7 @@ type Draft = {
 export default function AdminPage() {
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     fetchDrafts();
@@ -39,8 +40,27 @@ export default function AdminPage() {
     setLoading(false);
   };
 
+  const generateAISuggestions = async () => {
+    setGenerating(true);
+
+    try {
+      const res = await fetch("/api/ai/generate-spots", {
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        throw new Error("AI generation failed");
+      }
+
+      await fetchDrafts();
+    } catch (err) {
+      alert("Failed to generate AI suggestions");
+    }
+
+    setGenerating(false);
+  };
+
   const approveDraft = async (draft: Draft) => {
-    // 1. Insert into approved spots
     const { error: insertError } = await supabase
       .from("approved_spots")
       .insert({
@@ -55,13 +75,11 @@ export default function AdminPage() {
       return;
     }
 
-    // 2. Remove from AI suggestions
     await supabase
       .from("ai_suggested_spots")
       .delete()
       .eq("id", draft.id);
 
-    // 3. Refresh list
     fetchDrafts();
   };
 
@@ -72,6 +90,14 @@ export default function AdminPage() {
         <p>
           Automation status: <strong>MANUAL ONLY</strong> (admin-triggered)
         </p>
+
+        <button
+          className="generate-btn"
+          onClick={generateAISuggestions}
+          disabled={generating}
+        >
+          {generating ? "Generating…" : "Generate AI Suggestions"}
+        </button>
       </header>
 
       {loading && <p>Loading AI drafts...</p>}
