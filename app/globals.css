@@ -384,3 +384,15 @@ footer {
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: white;
 }
+.hub-switcher select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #ffffff;     /* solid background */
+  color: #0f172a;          /* dark text */
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+}
+
+.hub-switcher option {
+  color: #0f172a;
+}

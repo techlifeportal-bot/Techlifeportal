@@ -57,7 +57,10 @@ export default function PGsPage() {
             value={selectedHub}
             onChange={(e) => setSelectedHub(e.target.value)}
           >
-            <option value="">Select your IT hub</option>
+            <option value="" disabled>
+              Select your IT hub
+            </option>
+
             {IT_HUBS.map((hub) => (
               <option key={hub} value={hub}>
                 {hub}
