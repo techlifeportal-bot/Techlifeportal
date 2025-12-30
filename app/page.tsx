@@ -26,7 +26,6 @@ export default function HomePage() {
 
   const handleContinue = () => {
     if (!selected) return;
-
     const slug = selected.toLowerCase().replace(/\s+/g, "-");
     router.push(`/it-hubs/${slug}`);
   };
@@ -87,9 +86,49 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FEATURES */}
+      {/* FEATURES (RESTORED) */}
       <section className="feature-grid">
-        {/* (unchanged – keeping it clean) */}
+        <div className="feature-card">
+          <h2>🌴 Weekend Spots</h2>
+          <p>Relaxed places IT professionals visit after work.</p>
+          <Link href="/weekend-spots">Explore weekend spots →</Link>
+        </div>
+
+        <div className="feature-card">
+          <h2>🏠 PGs & Rentals</h2>
+          <p>PGs and rentals near Bangalore tech hubs.</p>
+          <Link href="/pgs">View PGs & rentals →</Link>
+        </div>
+
+        <div className="feature-card">
+          <h2>☕ Cafes</h2>
+          <p>Cafes around IT hubs for work, meetings, and breaks.</p>
+          <span className="badge">Unlocks gradually as community grows</span>
+        </div>
+
+        <div className="feature-card">
+          <h2>🏋️ Gyms</h2>
+          <p>Gyms and fitness centers near major tech corridors.</p>
+          <span className="badge">Unlocks gradually as community grows</span>
+        </div>
+
+        <div className="feature-card">
+          <h2>🏢 Companies</h2>
+          <p>IT companies and startups operating in nearby tech hubs.</p>
+          <span className="badge">Unlocks gradually as community grows</span>
+        </div>
+
+        <div className="feature-card">
+          <h2>💼 IT Jobs</h2>
+          <p>Job openings from companies located in IT hubs.</p>
+          <span className="badge">Unlocks gradually as community grows</span>
+        </div>
+
+        <div className="feature-card">
+          <h2>🤖 AI Resume Builder</h2>
+          <p>Create ATS-friendly resumes tailored for IT jobs.</p>
+          <span className="badge">Unlocks gradually as community grows</span>
+        </div>
       </section>
 
       {/* ABOUT */}
