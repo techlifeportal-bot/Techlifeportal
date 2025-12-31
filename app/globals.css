@@ -755,3 +755,10 @@ body {
   );
   pointer-events: none;
 }
+/* --- Weekend spot card title fix --- */
+.feature-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f8fafc; /* bright but not harsh white */
+  margin-bottom: 10px;
+}
