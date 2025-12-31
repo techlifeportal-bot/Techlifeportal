@@ -762,3 +762,41 @@ body {
   color: #f8fafc; /* bright but not harsh white */
   margin-bottom: 10px;
 }
+/* Premium dark select dropdown */
+select.hub-select {
+  background: linear-gradient(145deg, #0b1224, #0e1630);
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Dropdown options */
+select.hub-select option {
+  background-color: #0b1224;
+  color: #f1f5f9;
+}
+/* Weekend spot title */
+.spot-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f8fafc;
+  margin-bottom: 10px;
+}
+/* Weekend spot title */
+.spot-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f8fafc;
+  margin-bottom: 10px;
+}
+
+/* Premium dark select dropdown */
+select.hub-select {
+  background: linear-gradient(145deg, #0b1224, #0e1630);
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+select.hub-select option {
+  background-color: #0b1224;
+  color: #f1f5f9;
+}

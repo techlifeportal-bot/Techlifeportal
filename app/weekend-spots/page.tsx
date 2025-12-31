@@ -14,6 +14,7 @@ type WeekendSpot = {
   description: string;
   category: string | null;
   maps_url: string | null;
+  status: string;
 };
 
 const CATEGORIES = [
@@ -31,12 +32,14 @@ export default function WeekendSpotsPage() {
 
   useEffect(() => {
     const fetchSpots = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("weekend_spots")
         .select("*")
         .eq("status", "active");
 
-      if (data) setSpots(data);
+      if (!error && data) {
+        setSpots(data);
+      }
       setLoading(false);
     };
 
@@ -47,7 +50,7 @@ export default function WeekendSpotsPage() {
     return <p style={{ padding: "40px" }}>Loading weekend spots…</p>;
   }
 
-  // Group spots by category
+  // Group spots by category (supports multiple categories per spot)
   const grouped: Record<string, WeekendSpot[]> = {};
 
   spots.forEach((spot) => {
@@ -71,8 +74,10 @@ export default function WeekendSpotsPage() {
         <div className="feature-grid">
           {grouped[key].map((spot) => (
             <div key={spot.id} className="feature-card">
-              <h3 style={{ marginBottom: "8px" }}>{spot.name}</h3>
-              <p>{spot.description}</p>
+              <div>
+                <h3 className="spot-title">{spot.name}</h3>
+                <p>{spot.description}</p>
+              </div>
 
               {spot.maps_url && (
                 <a
@@ -104,9 +109,9 @@ export default function WeekendSpotsPage() {
           Choose category
         </label>
         <select
+          className="hub-select"
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="hub-select"
         >
           {CATEGORIES.map((cat) => (
             <option key={cat.key} value={cat.key}>
