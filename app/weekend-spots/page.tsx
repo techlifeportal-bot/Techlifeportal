@@ -10,8 +10,8 @@ const supabase = createClient(
 
 type WeekendSpot = {
   id: string;
-  name: string;
-  description: string;
+  name: string | null;
+  description: string | null;
   category: string | null;
   maps_url: string | null;
   status: string;
@@ -27,30 +27,22 @@ const CATEGORIES = [
 
 export default function WeekendSpotsPage() {
   const [spots, setSpots] = useState<WeekendSpot[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   useEffect(() => {
     const fetchSpots = async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("weekend_spots")
-        .select("*")
+        .select("id, name, description, category, maps_url, status")
         .eq("status", "active");
 
-      if (!error && data) {
-        setSpots(data);
-      }
-      setLoading(false);
+      if (data) setSpots(data);
     };
 
     fetchSpots();
   }, []);
 
-  if (loading) {
-    return <p style={{ padding: "40px" }}>Loading weekend spots…</p>;
-  }
-
-  // Group spots by category (supports multiple categories per spot)
+  // Group by category (supports multiple categories per spot)
   const grouped: Record<string, WeekendSpot[]> = {};
 
   spots.forEach((spot) => {
@@ -65,7 +57,7 @@ export default function WeekendSpotsPage() {
 
   const renderSection = (title: string, key: string) => {
     if (selectedCategory !== "all" && selectedCategory !== key) return null;
-    if (!grouped[key] || grouped[key].length === 0) return null;
+    if (!grouped[key]?.length) return null;
 
     return (
       <section style={{ marginBottom: "70px" }}>
@@ -75,7 +67,18 @@ export default function WeekendSpotsPage() {
           {grouped[key].map((spot) => (
             <div key={spot.id} className="feature-card">
               <div>
-                <h3 className="spot-title">{spot.name}</h3>
+                {/* FORCE TITLE VISIBILITY */}
+                <h3
+                  style={{
+                    color: "#ffffff",
+                    fontSize: "18px",
+                    fontWeight: 600,
+                    marginBottom: "10px",
+                  }}
+                >
+                  {spot.name || "Unnamed place"}
+                </h3>
+
                 <p>{spot.description}</p>
               </div>
 
@@ -103,7 +106,7 @@ export default function WeekendSpotsPage() {
         not location.
       </p>
 
-      {/* CATEGORY SELECTOR */}
+      {/* CATEGORY SELECT */}
       <div style={{ marginBottom: "50px", maxWidth: "260px" }}>
         <label style={{ display: "block", marginBottom: "6px" }}>
           Choose category
