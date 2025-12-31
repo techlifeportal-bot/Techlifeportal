@@ -14,7 +14,6 @@ type WeekendSpot = {
   description: string | null;
   category: string | null;
   maps_url: string | null;
-  status: string;
 };
 
 const CATEGORIES = [
@@ -28,21 +27,29 @@ const CATEGORIES = [
 export default function WeekendSpotsPage() {
   const [spots, setSpots] = useState<WeekendSpot[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSpots = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("weekend_spots")
-        .select("id, name, description, category, maps_url, status")
-        .eq("status", "active");
+        .select("id, name, description, category, maps_url");
 
-      if (data) setSpots(data);
+      if (!error && data) {
+        setSpots(data);
+      }
+
+      setLoading(false);
     };
 
     fetchSpots();
   }, []);
 
-  // Group by category (supports multiple categories per spot)
+  if (loading) {
+    return <p style={{ padding: "40px" }}>Loading weekend spots…</p>;
+  }
+
+  // Group spots by category (supports multiple categories)
   const grouped: Record<string, WeekendSpot[]> = {};
 
   spots.forEach((spot) => {
@@ -57,7 +64,7 @@ export default function WeekendSpotsPage() {
 
   const renderSection = (title: string, key: string) => {
     if (selectedCategory !== "all" && selectedCategory !== key) return null;
-    if (!grouped[key]?.length) return null;
+    if (!grouped[key] || grouped[key].length === 0) return null;
 
     return (
       <section style={{ marginBottom: "70px" }}>
@@ -67,7 +74,6 @@ export default function WeekendSpotsPage() {
           {grouped[key].map((spot) => (
             <div key={spot.id} className="feature-card">
               <div>
-                {/* FORCE TITLE VISIBILITY */}
                 <h3
                   style={{
                     color: "#ffffff",
@@ -76,9 +82,8 @@ export default function WeekendSpotsPage() {
                     marginBottom: "10px",
                   }}
                 >
-                  {spot.name || "Unnamed place"}
+                  {spot.name}
                 </h3>
-
                 <p>{spot.description}</p>
               </div>
 
