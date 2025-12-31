@@ -800,3 +800,62 @@ select.hub-select option {
   background-color: #0b1224;
   color: #f1f5f9;
 }
+.page-container {
+  padding: 60px 80px;
+}
+
+.page-header h1 {
+  font-size: 42px;
+  margin-bottom: 8px;
+}
+
+.page-header p {
+  opacity: 0.8;
+  max-width: 600px;
+}
+
+.filter-box {
+  margin-top: 24px;
+}
+
+.premium-select {
+  margin-top: 8px;
+  background: #020617;
+  color: #fff;
+  border: 1px solid #1e293b;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.card-grid {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.spot-card {
+  background: linear-gradient(180deg, #0b1220, #020617);
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.spot-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.spot-desc {
+  opacity: 0.85;
+  line-height: 1.5;
+}
+
+.maps-link {
+  display: inline-block;
+  margin-top: 14px;
+  color: #60a5fa;
+  text-decoration: none;
+}
