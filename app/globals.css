@@ -1063,3 +1063,17 @@ select option {
               0 8px 30px rgba(88, 166, 255, 0.25);
   transform: translateY(-2px);
 }
+/* Homepage cards – same glow effect */
+.feature-card,
+.home-card {
+  border: 1px solid transparent;
+  transition: border 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.feature-card:hover,
+.home-card:hover {
+  border-color: rgba(88, 166, 255, 0.9);
+  box-shadow: 0 0 0 1px rgba(88, 166, 255, 0.6),
+              0 8px 30px rgba(88, 166, 255, 0.25);
+  transform: translateY(-2px);
+}
