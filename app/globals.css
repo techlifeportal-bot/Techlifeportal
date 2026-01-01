@@ -1039,3 +1039,14 @@ select option {
   box-shadow: 0 0 0 1px rgba(120, 180, 255, 0.4),
               0 0 24px rgba(120, 180, 255, 0.15);
 }
+/* Weekend spot card hover glow */
+.weekend-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.weekend-card:hover {
+  border-color: #38bdf8; /* sky blue */
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6),
+              0 0 24px rgba(56, 189, 248, 0.25);
+}
