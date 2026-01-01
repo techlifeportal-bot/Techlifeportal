@@ -19,6 +19,8 @@ export default function WeekendSpotsPage() {
 
   useEffect(() => {
     const fetchSpots = async () => {
+      setLoading(true);
+
       const { data, error } = await supabase
         .from("weekend_spots")
         .select("id, tag, category, location, maps_url, image_url")
@@ -51,6 +53,7 @@ export default function WeekendSpotsPage() {
 
   return (
     <main className="page-container">
+      {/* HEADER */}
       <header className="page-header">
         <h1>Explore Weekend Spots</h1>
         <p>
@@ -74,47 +77,58 @@ export default function WeekendSpotsPage() {
         </div>
       </header>
 
-      {loading && <p>Loading weekend spots...</p>}
+      {/* SKELETON LOADING */}
+      {loading && (
+        <section className="card-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="skeleton" />
+          ))}
+        </section>
+      )}
 
+      {/* EMPTY STATE */}
       {!loading && filteredSpots.length === 0 && (
         <p>No weekend spots found.</p>
       )}
 
-      <section className="card-grid">
-        {filteredSpots.map((spot) => (
-          <div key={spot.id} className="card">
-            {/* IMAGE */}
-            {spot.image_url && (
-              <img
-                src={spot.image_url}
-                alt={spot.tag || "Weekend spot"}
-                className="spot-image"
-                loading="lazy"
-              />
-            )}
+      {/* CARDS */}
+      {!loading && filteredSpots.length > 0 && (
+        <section className="card-grid">
+          {filteredSpots.map((spot) => (
+            <div key={spot.id} className="card">
+              {/* IMAGE */}
+              {spot.image_url && (
+                <img
+                  src={spot.image_url}
+                  alt={spot.tag || "Weekend spot"}
+                  className="spot-image"
+                  loading="lazy"
+                />
+              )}
 
-            {/* TITLE */}
-            <h3>{spot.tag || "Unnamed Spot"}</h3>
+              {/* TITLE */}
+              <h3>{spot.tag || "Unnamed Spot"}</h3>
 
-            {/* LOCATION */}
-            {spot.location && (
-              <p className="location">{spot.location}</p>
-            )}
+              {/* LOCATION */}
+              {spot.location && (
+                <p className="location">{spot.location}</p>
+              )}
 
-            {/* MAP LINK */}
-            {spot.maps_url && (
-              <a
-                href={spot.maps_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="map-link"
-              >
-                View on Google Maps →
-              </a>
-            )}
-          </div>
-        ))}
-      </section>
+              {/* MAP LINK */}
+              {spot.maps_url && (
+                <a
+                  href={spot.maps_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="map-link"
+                >
+                  View on Google Maps →
+                </a>
+              )}
+            </div>
+          ))}
+        </section>
+      )}
     </main>
   );
 }
