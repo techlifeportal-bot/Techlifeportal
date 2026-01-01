@@ -1224,3 +1224,31 @@ select option {
     font-size: 15px;
   }
 }
+@media (max-width: 768px) {
+  /* Bigger tap targets */
+  a {
+    display: inline-block;
+    min-height: 44px;
+    line-height: 44px;
+  }
+
+  /* Cards feel more tappable */
+  .card {
+    cursor: pointer;
+  }
+}
+@media (max-width: 768px) {
+  .filter-box {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(2, 6, 23, 0.95);
+    padding-bottom: 12px;
+    backdrop-filter: blur(8px);
+  }
+}
+@media (max-width: 768px) {
+  .card:active {
+    transform: scale(0.98);
+  }
+}
