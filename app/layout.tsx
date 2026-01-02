@@ -1,18 +1,16 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import Footer from "@/app/components/Footer";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "TechLifePortal – Built for Bangalore IT Professionals",
   description:
     "TechLifePortal helps Bangalore IT professionals discover weekend spots, PGs, rentals, and lifestyle essentials around their workplace.",
-
   icons: {
     icon: "/favicon.ico",
     apple: "/logo.png",
   },
 };
-
-
 
 export default function RootLayout({
   children,
@@ -52,6 +50,9 @@ export default function RootLayout({
 
         {/* Page content */}
         <main>{children}</main>
+
+        {/* Footer */}
+        <Footer />
       </body>
     </html>
   );
