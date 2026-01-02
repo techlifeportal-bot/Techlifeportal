@@ -18,7 +18,7 @@ export default function ContactPage() {
             href="mailto:contacttechlifeportal@gmail.com"
             className="text-black hover:underline"
           >
-            techlifeportal@gmail.com
+            contacttechlifeportal@gmail.com
           </a>
         </p>
       </div>
