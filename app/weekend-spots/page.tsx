@@ -8,6 +8,7 @@ type WeekendSpot = {
   tag: string | null;
   category: string | null;
   location: string | null;
+  travel_time: string | null;
   maps_url: string | null;
   image_url: string | null;
 };
@@ -23,7 +24,9 @@ export default function WeekendSpotsPage() {
 
       const { data, error } = await supabase
         .from("weekend_spots")
-        .select("id, tag, category, location, maps_url, image_url")
+        .select(
+          "id, tag, category, location, travel_time, maps_url, image_url"
+        )
         .order("id", { ascending: true });
 
       if (error) {
@@ -56,8 +59,8 @@ export default function WeekendSpotsPage() {
       <header className="page-header">
         <h1>Explore Weekend Spots</h1>
         <p>
-          Discover weekend destinations around Bangalore — explore by interest,
-          not location.
+          Plan your weekend better — see travel time from Bangalore before you
+          go.
         </p>
 
         {/* CATEGORY SELECT */}
@@ -96,6 +99,7 @@ export default function WeekendSpotsPage() {
         <section className="card-grid">
           {filteredSpots.map((spot) => (
             <div key={spot.id} className="card">
+              {/* IMAGE */}
               {spot.image_url && (
                 <img
                   src={spot.image_url}
@@ -105,12 +109,22 @@ export default function WeekendSpotsPage() {
                 />
               )}
 
+              {/* TITLE */}
               <h3>{spot.tag || "Unnamed Spot"}</h3>
 
+              {/* LOCATION */}
               {spot.location && (
-                <p className="location">{spot.location}</p>
+                <p className="location">📍 {spot.location}</p>
               )}
 
+              {/* TRAVEL TIME */}
+              {spot.travel_time && (
+                <p className="travel-time">
+                  ⏱️ ~{spot.travel_time} from Bangalore
+                </p>
+              )}
+
+              {/* MAP LINK */}
               {spot.maps_url && (
                 <a
                   href={spot.maps_url}
