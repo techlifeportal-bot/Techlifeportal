@@ -12,6 +12,12 @@ type PG = {
   hub: string | null;
 };
 
+const HIDDEN_HUBS = ["outer ring road", "orr"];
+
+function normalizeHub(hub: string) {
+  return hub.trim().toLowerCase();
+}
+
 export default function PGsPage() {
   const [pgs, setPgs] = useState<PG[]>([]);
   const [selectedHub, setSelectedHub] = useState("all");
@@ -20,6 +26,7 @@ export default function PGsPage() {
   useEffect(() => {
     const fetchPGs = async () => {
       setLoading(true);
+
       const { data, error } = await supabase
         .from("pgs_rentals")
         .select("id, name, description, tag, maps_url, hub")
@@ -32,14 +39,33 @@ export default function PGsPage() {
     fetchPGs();
   }, []);
 
-  const hubs = Array.from(
-    new Set(pgs.map((pg) => pg.hub).filter(Boolean))
-  ) as string[];
+  // Build unique hub list (case-insensitive, trimmed, no ORR)
+  const hubMap = new Map<string, string>();
 
+  pgs.forEach((pg) => {
+    if (!pg.hub) return;
+    const norm = normalizeHub(pg.hub);
+    if (HIDDEN_HUBS.includes(norm)) return;
+    if (!hubMap.has(norm)) {
+      hubMap.set(norm, pg.hub.trim());
+    }
+  });
+
+  const hubs = Array.from(hubMap.values());
+
+  // Filter PGs
   const filteredPGs =
     selectedHub === "all"
-      ? pgs
-      : pgs.filter((pg) => pg.hub === selectedHub);
+      ? pgs.filter(
+          (pg) =>
+            pg.hub &&
+            !HIDDEN_HUBS.includes(normalizeHub(pg.hub))
+        )
+      : pgs.filter(
+          (pg) =>
+            pg.hub &&
+            normalizeHub(pg.hub) === normalizeHub(selectedHub)
+        );
 
   return (
     <main className="page-container">
@@ -88,18 +114,14 @@ export default function PGsPage() {
         <section className="card-grid">
           {filteredPGs.map((pg) => (
             <div key={pg.id} className="card pg-card">
-              {/* TAG */}
               {pg.tag && <span className="pg-tag">{pg.tag}</span>}
 
-              {/* NAME */}
               <h3 className="pg-title">{pg.name}</h3>
 
-              {/* DESCRIPTION */}
               {pg.description && (
                 <p className="pg-desc">{pg.description}</p>
               )}
 
-              {/* MAP LINK */}
               {pg.maps_url && (
                 <a
                   href={pg.maps_url}
