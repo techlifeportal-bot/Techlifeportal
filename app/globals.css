@@ -1262,3 +1262,13 @@ select option {
   opacity: 0.85;
   margin-top: 4px;
 }
+.pg-tag {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(80, 120, 255, 0.15);
+  color: #7da2ff;
+  margin-bottom: 8px;
+}

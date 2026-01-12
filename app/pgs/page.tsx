@@ -1,41 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabaseClient";
 
-const IT_HUBS = [
-  { label: "Electronic City", value: "electronic city" },
-  { label: "Whitefield", value: "whitefield" },
-  { label: "Outer Ring Road", value: "outer ring road" },
-  { label: "Bellandur", value: "bellandur" },
-  { label: "HSR Layout", value: "hsr layout" },
-  { label: "Manyata Tech Park", value: "manyata tech park" },
-];
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+type PG = {
+  id: number;
+  name: string;
+  description: string | null;
+  tag: string | null;
+  maps_url: string | null;
+  hub: string | null;
+};
 
 export default function PGsPage() {
-  const [selectedHub, setSelectedHub] = useState("");
-  const [pgs, setPgs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [pgs, setPgs] = useState<PG[]>([]);
+  const [selectedHub, setSelectedHub] = useState("all");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!selectedHub) return;
-
     const fetchPGs = async () => {
       setLoading(true);
 
       const { data, error } = await supabase
         .from("pgs_rentals")
-        .select("*")
-        .ilike("hub", selectedHub);
+        .select("id, name, description, tag, maps_url, hub")
+        .order("priority", { ascending: false });
 
       if (error) {
-        console.error(error);
-        setPgs([]);
+        console.error("Error fetching PGs:", error);
       } else {
         setPgs(data || []);
       }
@@ -44,68 +36,84 @@ export default function PGsPage() {
     };
 
     fetchPGs();
-  }, [selectedHub]);
+  }, []);
+
+  const hubs = Array.from(
+    new Set(pgs.map((pg) => pg.hub).filter(Boolean))
+  ) as string[];
+
+  const filteredPGs =
+    selectedHub === "all"
+      ? pgs
+      : pgs.filter((pg) => pg.hub === selectedHub);
 
   return (
-    <main className="hub-page">
+    <main className="page-container">
       {/* HEADER */}
-      <section className="hub-header">
+      <header className="page-header">
         <h1>PGs & Rentals</h1>
-        <p>
-          Select your IT hub to view PGs & rentals near your hub.
-        </p>
+        <p>Find PGs near your IT hub.</p>
 
-        {/* HUB SELECTOR */}
-        <div className="hub-switcher">
+        {/* HUB SELECT */}
+        <div className="filter-box">
+          <label>Select hub</label>
           <select
             value={selectedHub}
             onChange={(e) => setSelectedHub(e.target.value)}
           >
-            <option value="" disabled>
-              Select your IT hub
-            </option>
-
-            {IT_HUBS.map((hub) => (
-              <option key={hub.value} value={hub.value}>
-                {hub.label}
+            <option value="all">All hubs</option>
+            {hubs.map((hub) => (
+              <option key={hub} value={hub}>
+                {hub}
               </option>
             ))}
           </select>
         </div>
-      </section>
+      </header>
 
-      {/* STATES */}
-      {loading && <p>Loading PGs...</p>}
-
-      {!loading && selectedHub && pgs.length === 0 && (
-        <p className="hub-empty">
-          No PGs listed yet for this IT hub.
-        </p>
+      {/* LOADING */}
+      {loading && (
+        <section className="card-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="skeleton" />
+          ))}
+        </section>
       )}
 
-      {/* PG LIST */}
-      <section className="hub-grid">
-        {pgs.map((pg) => (
-          <div key={pg.id} className="hub-card">
-            <h3>{pg.name}</h3>
+      {/* EMPTY */}
+      {!loading && filteredPGs.length === 0 && (
+        <p>No PGs found for this hub.</p>
+      )}
 
-            {pg.description && (
-              <p className="hub-address">{pg.description}</p>
-            )}
+      {/* CARDS */}
+      {!loading && filteredPGs.length > 0 && (
+        <section className="card-grid">
+          {filteredPGs.map((pg) => (
+            <div key={pg.id} className="card pg-card">
+              {/* TAG */}
+              {pg.tag && <span className="pg-tag">{pg.tag}</span>}
 
-            {pg.maps_url && (
-              <a
-                href={pg.maps_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="map-link"
-              >
-                📍 View on Google Maps
-              </a>
-            )}
-          </div>
-        ))}
-      </section>
+              {/* NAME */}
+              <h3>{pg.name}</h3>
+
+              {/* DESCRIPTION */}
+              {pg.description && <p>{pg.description}</p>}
+
+              {/* MAP LINK */}
+              {pg.maps_url && (
+                <a
+                  href={pg.maps_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="map-link"
+                >
+                  View on Google Maps →
+                </a>
+              )}
+            </div>
+          ))}
+        </section>
+      )}
     </main>
   );
 }
