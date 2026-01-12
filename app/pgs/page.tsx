@@ -20,18 +20,12 @@ export default function PGsPage() {
   useEffect(() => {
     const fetchPGs = async () => {
       setLoading(true);
-
       const { data, error } = await supabase
         .from("pgs_rentals")
         .select("id, name, description, tag, maps_url, hub")
         .order("priority", { ascending: false });
 
-      if (error) {
-        console.error("Error fetching PGs:", error);
-      } else {
-        setPgs(data || []);
-      }
-
+      if (!error) setPgs(data || []);
       setLoading(false);
     };
 
@@ -54,7 +48,6 @@ export default function PGsPage() {
         <h1>PGs & Rentals</h1>
         <p>Find PGs near your IT hub.</p>
 
-        {/* HUB SELECT */}
         <div className="filter-box">
           <label>Select hub</label>
           <select
@@ -68,6 +61,9 @@ export default function PGsPage() {
               </option>
             ))}
           </select>
+          <small className="filter-hint">
+            Choose a hub to see nearby PGs
+          </small>
         </div>
       </header>
 
@@ -82,7 +78,9 @@ export default function PGsPage() {
 
       {/* EMPTY */}
       {!loading && filteredPGs.length === 0 && (
-        <p>No PGs found for this hub.</p>
+        <p className="empty-state">
+          No PGs added for this hub yet.
+        </p>
       )}
 
       {/* CARDS */}
@@ -94,10 +92,12 @@ export default function PGsPage() {
               {pg.tag && <span className="pg-tag">{pg.tag}</span>}
 
               {/* NAME */}
-              <h3>{pg.name}</h3>
+              <h3 className="pg-title">{pg.name}</h3>
 
               {/* DESCRIPTION */}
-              {pg.description && <p>{pg.description}</p>}
+              {pg.description && (
+                <p className="pg-desc">{pg.description}</p>
+              )}
 
               {/* MAP LINK */}
               {pg.maps_url && (
@@ -107,7 +107,7 @@ export default function PGsPage() {
                   rel="noopener noreferrer"
                   className="map-link"
                 >
-                  View on Google Maps →
+                  Open in Google Maps →
                 </a>
               )}
             </div>
