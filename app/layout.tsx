@@ -11,6 +11,12 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
     apple: "/logo.png",
   },
+  openGraph: {
+    title: "TechLifePortal",
+    description:
+      "TechLifePortal helps Bangalore IT professionals discover weekend spots, PGs, rentals, and lifestyle essentials around their workplace.",
+    images: ["/logo.png"],
+  },
 };
 
 export default function RootLayout({
@@ -20,6 +26,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* Structured data for Google logo */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "TechLifePortal",
+              url: "https://YOURDOMAIN.com",
+              logo: "https://YOURDOMAIN.com/logo.png",
+            }),
+          }}
+        />
+      </head>
+
       <body>
         {/* Header */}
         <header
