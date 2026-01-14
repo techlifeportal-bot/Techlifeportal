@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   description:
     "TechLifePortal helps Bangalore IT professionals discover weekend spots, PGs, rentals, and lifestyle essentials around their workplace.",
   icons: {
-    icon: "/favicon.ico",
-    apple: "/logo.png",
+    icon: "/favicon.ico",   // tab icon
+    apple: "/logo.png",     // mobile / Apple icon
   },
 };
 
@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* Header */}
+        {/* Header with logo */}
         <header
           style={{
             display: "flex",
@@ -31,6 +31,7 @@ export default function RootLayout({
             borderBottom: "1px solid rgba(255,255,255,0.08)",
           }}
         >
+          {/* Your logo */}
           <img
             src="/logo.svg"
             alt="TechLifePortal logo"
@@ -38,6 +39,7 @@ export default function RootLayout({
             height={36}
           />
 
+          {/* Brand name */}
           <span
             style={{
               fontSize: "1.4rem",
