@@ -22,6 +22,15 @@ export default function WeekendSpotsPage() {
     const fetchSpots = async () => {
       setLoading(true);
 
+      // Try cache first
+      const cached = localStorage.getItem("weekend_spots_cache");
+      if (cached) {
+        setSpots(JSON.parse(cached));
+        setLoading(false);
+        return;
+      }
+
+      // Fetch from Supabase
       const { data, error } = await supabase
         .from("weekend_spots")
         .select(
@@ -33,6 +42,7 @@ export default function WeekendSpotsPage() {
         console.error("Error fetching weekend spots:", error);
       } else {
         setSpots(data || []);
+        localStorage.setItem("weekend_spots_cache", JSON.stringify(data || []));
       }
 
       setLoading(false);
