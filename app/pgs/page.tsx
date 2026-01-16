@@ -27,12 +27,25 @@ export default function PGsPage() {
     const fetchPGs = async () => {
       setLoading(true);
 
+      // Try cache first
+      const cached = localStorage.getItem("pgs_cache");
+      if (cached) {
+        setPgs(JSON.parse(cached));
+        setLoading(false);
+        return;
+      }
+
+      // Fetch from Supabase
       const { data, error } = await supabase
         .from("pgs_rentals")
         .select("id, name, description, tag, maps_url, hub")
         .order("priority", { ascending: false });
 
-      if (!error) setPgs(data || []);
+      if (!error) {
+        setPgs(data || []);
+        localStorage.setItem("pgs_cache", JSON.stringify(data || []));
+      }
+
       setLoading(false);
     };
 
