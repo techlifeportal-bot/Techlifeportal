@@ -1312,3 +1312,88 @@ select option {
   opacity: 0.7;
   margin-top: 20px;
 }
+.feedback-wrap {
+  margin: 80px 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.feedback-card {
+  width: 100%;
+  max-width: 520px;
+  padding: 28px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+}
+
+.feedback-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.feedback-sub {
+  font-size: 0.95rem;
+  opacity: 0.8;
+  margin-bottom: 18px;
+  line-height: 1.4;
+}
+
+.feedback-card textarea,
+.feedback-card input {
+  width: 100%;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  color: white;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.feedback-card textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.feedback-card textarea::placeholder,
+.feedback-card input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.feedback-card textarea:focus,
+.feedback-card input:focus {
+  border-color: #3b82f6;
+}
+
+.feedback-card button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.feedback-card button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+.feedback-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.feedback-done {
+  margin-top: 12px;
+  color: #4ade80;
+  font-size: 0.9rem;
+  text-align: center;
+}
