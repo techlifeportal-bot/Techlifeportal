@@ -107,6 +107,9 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* FEEDBACK BOX */}
+      <FeedbackBox />
+
       {/* ABOUT SECTION */}
       <section className="about-section">
         <h2>About TechLifePortal</h2>
@@ -137,9 +140,6 @@ export default function HomePage() {
           Built with ❤️ for the IT community in Bangalore.
         </p>
       </section>
-
-      {/* FEEDBACK BOX */}
-      <FeedbackBox />
 
       {/* FOOTER */}
       <footer>
