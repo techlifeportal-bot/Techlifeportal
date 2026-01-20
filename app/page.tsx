@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Inter } from "next/font/google";
+import FeedbackBox from "@/app/components/FeedbackBox";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -107,35 +108,38 @@ export default function HomePage() {
       </section>
 
       {/* ABOUT SECTION */}
-     <section className="about-section">
-  <h2>About TechLifePortal</h2>
+      <section className="about-section">
+        <h2>About TechLifePortal</h2>
 
-  <p>
-    TechLifePortal is a Bangalore-focused platform built exclusively for IT
-    professionals. The goal is simple — to make everyday IT life easier by
-    bringing trusted, relevant information into one place.
-  </p>
+        <p>
+          TechLifePortal is a Bangalore-focused platform built exclusively for IT
+          professionals. The goal is simple — to make everyday IT life easier by
+          bringing trusted, relevant information into one place.
+        </p>
 
-  <p>
-    Instead of generic listings, TechLifePortal focuses on real needs around IT
-    hubs — where to stay, where to go on weekends, and how to balance work with
-    life.
-  </p>
+        <p>
+          Instead of generic listings, TechLifePortal focuses on real needs around IT
+          hubs — where to stay, where to go on weekends, and how to balance work with
+          life.
+        </p>
 
-  <p>
-    TechLifePortal is designed for moments when you haven’t planned much —
-    helping you quickly discover nearby places without overthinking.
-  </p>
+        <p>
+          TechLifePortal is designed for moments when you haven’t planned much —
+          helping you quickly discover nearby places without overthinking.
+        </p>
 
-  <p>
-    This platform is currently in beta and will grow gradually based on feedback
-    from the IT community.
-  </p>
+        <p>
+          This platform is currently in beta and will grow gradually based on feedback
+          from the IT community.
+        </p>
 
-  <p className="about-footer">
-    Built with ❤️ for the IT community in Bangalore.
-  </p>
-</section>
+        <p className="about-footer">
+          Built with ❤️ for the IT community in Bangalore.
+        </p>
+      </section>
+
+      {/* FEEDBACK BOX */}
+      <FeedbackBox />
 
       {/* FOOTER */}
       <footer>
