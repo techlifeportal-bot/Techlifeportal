@@ -17,13 +17,12 @@ const normalizeHub = (hub: string) => hub.trim().toLowerCase();
 export default function PGsPage() {
   const [stays, setStays] = useState<Stay[]>([]);
   const [selectedHub, setSelectedHub] = useState("all");
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  /* FETCH DATA */
   useEffect(() => {
     const fetchStays = async () => {
       setLoading(true);
-
       const { data } = await supabase
         .from("pgs_rentals")
         .select("id, name, description, tag, maps_url, hub")
@@ -32,11 +31,9 @@ export default function PGsPage() {
       setStays(data || []);
       setLoading(false);
     };
-
     fetchStays();
   }, []);
 
-  /* HUB LIST */
   const hubs = Array.from(
     new Set(
       stays
@@ -46,7 +43,6 @@ export default function PGsPage() {
     )
   );
 
-  /* FILTER */
   const filteredStays = stays.filter((stay) => {
     if (!stay.hub) return false;
     if (selectedHub === "all") return true;
@@ -59,67 +55,61 @@ export default function PGsPage() {
         <h1>PGs & Rentals</h1>
         <p>Find stays near your IT hub.</p>
 
-        {/* HUB SELECT */}
-        <div style={{ marginTop: "16px" }}>
-          <label
-            style={{
-              display: "block",
-              marginBottom: "6px",
-              color: "#e5e7eb",
-            }}
-          >
-            Select IT hub
-          </label>
+        {/* CUSTOM DARK DROPDOWN */}
+        <div className="dropdown">
+          <label>Select IT hub</label>
 
-          <select
-            value={selectedHub}
-            onChange={(e) => setSelectedHub(e.target.value)}
-            className="dark-select"
+          <button
+            className="dropdown-trigger"
+            onClick={() => setOpen(!open)}
           >
-            <option value="all">All hubs</option>
-            {hubs.map((hub) => (
-              <option key={hub} value={hub}>
-                {hub}
-              </option>
-            ))}
-          </select>
+            {selectedHub === "all" ? "All hubs" : selectedHub}
+            <span className="arrow">▾</span>
+          </button>
+
+          {open && (
+            <div className="dropdown-menu">
+              <div
+                className="dropdown-item"
+                onClick={() => {
+                  setSelectedHub("all");
+                  setOpen(false);
+                }}
+              >
+                All hubs
+              </div>
+
+              {hubs.map((hub) => (
+                <div
+                  key={hub}
+                  className="dropdown-item"
+                  onClick={() => {
+                    setSelectedHub(hub);
+                    setOpen(false);
+                  }}
+                >
+                  {hub}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </header>
 
-      {/* LOADING */}
-      {loading && <p style={{ marginTop: "20px" }}>Loading PGs…</p>}
-
-      {/* EMPTY */}
       {!loading && filteredStays.length === 0 && (
-        <p style={{ marginTop: "20px" }}>No PGs found.</p>
+        <p>No PGs found.</p>
       )}
 
-      {/* CARDS */}
       {!loading && filteredStays.length > 0 && (
         <section className="card-grid">
           {filteredStays.map((stay) => (
             <div key={stay.id} className="card pg-card">
-              {stay.tag && (
-                <span className="pg-tag">{stay.tag}</span>
-              )}
-
-              <h3 className="pg-title">{stay.name}</h3>
-
-              {stay.hub && (
-                <p className="pg-hub">📍 {stay.hub}</p>
-              )}
-
-              {stay.description && (
-                <p className="pg-desc">{stay.description}</p>
-              )}
-
+              {stay.tag && <span className="pg-tag">{stay.tag}</span>}
+              <h3>{stay.name}</h3>
+              <p className="pg-hub">📍 {stay.hub}</p>
+              {stay.description && <p>{stay.description}</p>}
               {stay.maps_url && (
-                <a
-                  href={stay.maps_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="map-link"
-                >
+                <a href={stay.maps_url} target="_blank">
                   View on Google Maps →
                 </a>
               )}
