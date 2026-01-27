@@ -1418,3 +1418,25 @@ select option {
   border-color: #2563eb;
   font-weight: 500;
 }
+/* ---------- FIX DARK MODE SELECT ---------- */
+
+.hub-select {
+  background-color: #0b1220;
+  color: #ffffff;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.hub-select option {
+  color: #000000;
+  background-color: #ffffff;
+}
+
+/* ---------- HUB TEXT IN CARD ---------- */
+
+.pg-hub {
+  font-size: 0.85rem;
+  color: #93c5fd;
+  margin: 4px 0 6px;
+}

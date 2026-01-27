@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 type Stay = {
-  id: number;
+  id: string;
   name: string;
   description: string | null;
   tag: string | null;
@@ -15,15 +15,16 @@ type Stay = {
 
 const HIDDEN_HUBS = ["outer ring road", "orr"];
 
-function normalizeHub(hub: string) {
-  return hub.trim().toLowerCase();
-}
+const normalizeHub = (hub: string) =>
+  hub.trim().toLowerCase();
 
 export default function PGsPage() {
   const [stays, setStays] = useState<Stay[]>([]);
   const [selectedHub, setSelectedHub] = useState("all");
   const [activeType, setActiveType] = useState<"pg" | "rental">("pg");
   const [loading, setLoading] = useState(true);
+
+  /* ---------------- FETCH DATA ---------------- */
 
   useEffect(() => {
     const fetchStays = async () => {
@@ -34,8 +35,8 @@ export default function PGsPage() {
         .select("id, name, description, tag, maps_url, hub, type")
         .order("priority", { ascending: false });
 
-      if (!error) {
-        setStays(data || []);
+      if (!error && data) {
+        setStays(data);
       }
 
       setLoading(false);
@@ -44,21 +45,20 @@ export default function PGsPage() {
     fetchStays();
   }, []);
 
-  /* ---------------- HUB LIST (BASED ON ACTIVE TAB) ---------------- */
+  /* ---------------- HUB LIST ---------------- */
 
   const hubMap = new Map<string, string>();
 
   stays.forEach((stay) => {
-    const stayType = stay.type ?? "pg"; // treat old rows as PGs
-
+    const stayType = stay.type ?? "pg";
     if (stayType !== activeType) return;
     if (!stay.hub) return;
 
-    const norm = normalizeHub(stay.hub);
-    if (HIDDEN_HUBS.includes(norm)) return;
+    const normalized = normalizeHub(stay.hub);
+    if (HIDDEN_HUBS.includes(normalized)) return;
 
-    if (!hubMap.has(norm)) {
-      hubMap.set(norm, stay.hub.trim());
+    if (!hubMap.has(normalized)) {
+      hubMap.set(normalized, stay.hub.trim());
     }
   });
 
@@ -68,22 +68,20 @@ export default function PGsPage() {
 
   const filteredStays = stays.filter((stay) => {
     const stayType = stay.type ?? "pg";
-
     if (stayType !== activeType) return false;
+    if (!stay.hub) return false;
 
     if (selectedHub === "all") {
-      return stay.hub && !HIDDEN_HUBS.includes(normalizeHub(stay.hub));
+      return !HIDDEN_HUBS.includes(normalizeHub(stay.hub));
     }
 
-    return (
-      stay.hub &&
-      normalizeHub(stay.hub) === normalizeHub(selectedHub)
-    );
+    return normalizeHub(stay.hub) === normalizeHub(selectedHub);
   });
+
+  /* ---------------- UI ---------------- */
 
   return (
     <main className="page-container">
-      {/* HEADER */}
       <header className="page-header">
         <h1>PGs & Rentals</h1>
         <p>Find stays near your IT hub.</p>
@@ -114,11 +112,14 @@ export default function PGsPage() {
         {/* HUB FILTER */}
         <div className="filter-box">
           <label>Select IT hub</label>
+
           <select
             value={selectedHub}
             onChange={(e) => setSelectedHub(e.target.value)}
+            className="hub-select"
           >
             <option value="all">All hubs</option>
+
             {hubs.map((hub) => (
               <option key={hub} value={hub}>
                 {hub}
@@ -127,15 +128,6 @@ export default function PGsPage() {
           </select>
         </div>
       </header>
-
-      {/* LOADING */}
-      {loading && (
-        <section className="card-grid">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="skeleton" />
-          ))}
-        </section>
-      )}
 
       {/* EMPTY STATE */}
       {!loading && filteredStays.length === 0 && (
@@ -149,11 +141,13 @@ export default function PGsPage() {
         <section className="card-grid">
           {filteredStays.map((stay) => (
             <div key={stay.id} className="card pg-card">
-              {stay.tag && (
-                <span className="pg-tag">{stay.tag}</span>
-              )}
+              {stay.tag && <span className="pg-tag">{stay.tag}</span>}
 
               <h3 className="pg-title">{stay.name}</h3>
+
+              {stay.hub && (
+                <p className="pg-hub">📍 {stay.hub}</p>
+              )}
 
               {stay.description && (
                 <p className="pg-desc">{stay.description}</p>
