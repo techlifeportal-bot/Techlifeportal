@@ -1595,3 +1595,91 @@ select option {
   color: #93c5fd;
   margin-bottom: 6px;
 }
+/* ===== TABS ===== */
+
+.type-tabs {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.type-tab {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: transparent;
+  color: #e5e7eb;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.type-tab.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: white;
+}
+
+/* ===== CUSTOM DARK DROPDOWN ===== */
+
+.dropdown {
+  position: relative;
+  width: 240px;
+  margin-top: 16px;
+}
+
+.dropdown label {
+  display: block;
+  margin-bottom: 6px;
+  color: #e5e7eb;
+}
+
+.dropdown-trigger {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.95);
+  color: white;
+  border: 1px solid rgba(96, 165, 250, 0.5);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dropdown-trigger:hover {
+  border-color: #60a5fa;
+}
+
+.arrow {
+  color: #93c5fd;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: #020617;
+  border: 1px solid rgba(96, 165, 250, 0.4);
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 50;
+}
+
+.dropdown-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  color: white;
+}
+
+.dropdown-item:hover {
+  background: #2563eb;
+}
+
+/* ===== HUB TEXT ===== */
+
+.pg-hub {
+  font-size: 0.85rem;
+  color: #93c5fd;
+  margin-bottom: 6px;
+}
