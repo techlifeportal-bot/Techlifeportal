@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-type PG = {
+type Stay = {
   id: number;
   name: string;
   description: string | null;
   tag: string | null;
   maps_url: string | null;
   hub: string | null;
+  type: "pg" | "rental";
 };
 
 const HIDDEN_HUBS = ["outer ring road", "orr"];
@@ -19,76 +20,82 @@ function normalizeHub(hub: string) {
 }
 
 export default function PGsPage() {
-  const [pgs, setPgs] = useState<PG[]>([]);
+  const [stays, setStays] = useState<Stay[]>([]);
   const [selectedHub, setSelectedHub] = useState("all");
+  const [activeType, setActiveType] = useState<"pg" | "rental">("pg");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPGs = async () => {
+    const fetchStays = async () => {
       setLoading(true);
 
-      // Try cache first
-      const cached = localStorage.getItem("pgs_cache");
-      if (cached) {
-        setPgs(JSON.parse(cached));
-        setLoading(false);
-        return;
-      }
-
-      // Fetch from Supabase
       const { data, error } = await supabase
         .from("pgs_rentals")
-        .select("id, name, description, tag, maps_url, hub")
+        .select("id, name, description, tag, maps_url, hub, type")
         .order("priority", { ascending: false });
 
-      if (!error) {
-        setPgs(data || []);
-        localStorage.setItem("pgs_cache", JSON.stringify(data || []));
-      }
-
+      if (!error) setStays(data || []);
       setLoading(false);
     };
 
-    fetchPGs();
+    fetchStays();
   }, []);
 
-  // Build unique hub list (case-insensitive, trimmed, no ORR)
+  /* Build unique hub list */
   const hubMap = new Map<string, string>();
 
-  pgs.forEach((pg) => {
-    if (!pg.hub) return;
-    const norm = normalizeHub(pg.hub);
+  stays.forEach((stay) => {
+    if (!stay.hub) return;
+    const norm = normalizeHub(stay.hub);
     if (HIDDEN_HUBS.includes(norm)) return;
     if (!hubMap.has(norm)) {
-      hubMap.set(norm, pg.hub.trim());
+      hubMap.set(norm, stay.hub.trim());
     }
   });
 
   const hubs = Array.from(hubMap.values());
 
-  // Filter PGs
-  const filteredPGs =
-    selectedHub === "all"
-      ? pgs.filter(
-          (pg) =>
-            pg.hub &&
-            !HIDDEN_HUBS.includes(normalizeHub(pg.hub))
-        )
-      : pgs.filter(
-          (pg) =>
-            pg.hub &&
-            normalizeHub(pg.hub) === normalizeHub(selectedHub)
-        );
+  /* Filter stays by type + hub */
+  const filteredStays = stays.filter((stay) => {
+    if (stay.type !== activeType) return false;
+
+    if (selectedHub === "all") {
+      return stay.hub && !HIDDEN_HUBS.includes(normalizeHub(stay.hub));
+    }
+
+    return (
+      stay.hub &&
+      normalizeHub(stay.hub) === normalizeHub(selectedHub)
+    );
+  });
 
   return (
     <main className="page-container">
       {/* HEADER */}
       <header className="page-header">
         <h1>PGs & Rentals</h1>
-        <p>Find PGs near your IT hub.</p>
+        <p>Find stays near your IT hub.</p>
 
+        {/* TYPE TABS */}
+        <div className="type-tabs">
+          <button
+            className={`type-tab ${activeType === "pg" ? "active" : ""}`}
+            onClick={() => setActiveType("pg")}
+          >
+            PGs
+          </button>
+
+          <button
+            className={`type-tab ${activeType === "rental" ? "active" : ""}`}
+            onClick={() => setActiveType("rental")}
+          >
+            Rentals
+          </button>
+        </div>
+
+        {/* HUB FILTER */}
         <div className="filter-box">
-          <label>Select hub</label>
+          <label>Select IT hub</label>
           <select
             value={selectedHub}
             onChange={(e) => setSelectedHub(e.target.value)}
@@ -100,9 +107,6 @@ export default function PGsPage() {
               </option>
             ))}
           </select>
-          <small className="filter-hint">
-            Choose a hub to see nearby PGs
-          </small>
         </div>
       </header>
 
@@ -115,34 +119,36 @@ export default function PGsPage() {
         </section>
       )}
 
-      {/* EMPTY */}
-      {!loading && filteredPGs.length === 0 && (
+      {/* EMPTY STATE */}
+      {!loading && filteredStays.length === 0 && (
         <p className="empty-state">
-          No PGs added for this hub yet.
+          No {activeType === "pg" ? "PGs" : "rentals"} found for this hub.
         </p>
       )}
 
       {/* CARDS */}
-      {!loading && filteredPGs.length > 0 && (
+      {!loading && filteredStays.length > 0 && (
         <section className="card-grid">
-          {filteredPGs.map((pg) => (
-            <div key={pg.id} className="card pg-card">
-              {pg.tag && <span className="pg-tag">{pg.tag}</span>}
-
-              <h3 className="pg-title">{pg.name}</h3>
-
-              {pg.description && (
-                <p className="pg-desc">{pg.description}</p>
+          {filteredStays.map((stay) => (
+            <div key={stay.id} className="card pg-card">
+              {stay.tag && (
+                <span className="pg-tag">{stay.tag}</span>
               )}
 
-              {pg.maps_url && (
+              <h3 className="pg-title">{stay.name}</h3>
+
+              {stay.description && (
+                <p className="pg-desc">{stay.description}</p>
+              )}
+
+              {stay.maps_url && (
                 <a
-                  href={pg.maps_url}
+                  href={stay.maps_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="map-link"
                 >
-                  Open in Google Maps →
+                  View on Google Maps →
                 </a>
               )}
             </div>
