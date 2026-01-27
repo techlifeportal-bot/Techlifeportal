@@ -12,8 +12,7 @@ type Stay = {
   hub: string | null;
 };
 
-const normalizeHub = (hub: string) =>
-  hub.trim().toLowerCase();
+const normalizeHub = (hub: string) => hub.trim().toLowerCase();
 
 export default function PGsPage() {
   const [stays, setStays] = useState<Stay[]>([]);
@@ -59,9 +58,7 @@ export default function PGsPage() {
 
     if (selectedHub === "all") return true;
 
-    return (
-      normalizeHub(stay.hub) === normalizeHub(selectedHub)
-    );
+    return normalizeHub(stay.hub) === normalizeHub(selectedHub);
   });
 
   /* ---------------- UI ---------------- */
@@ -72,9 +69,15 @@ export default function PGsPage() {
         <h1>PGs & Rentals</h1>
         <p>Find stays near your IT hub.</p>
 
-        {/* HUB FILTER (INLINE STYLES ONLY) */}
+        {/* HUB FILTER (INLINE STYLES – FINAL FIX) */}
         <div style={{ marginTop: "16px" }}>
-          <label style={{ display: "block", marginBottom: "6px" }}>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "6px",
+              color: "#e5e7eb",
+            }}
+          >
             Select IT hub
           </label>
 
@@ -87,10 +90,16 @@ export default function PGsPage() {
               padding: "10px",
               borderRadius: "8px",
               border: "1px solid rgba(255,255,255,0.3)",
-              minWidth: "200px",
+              minWidth: "240px",
             }}
           >
-            <option value="all" style={{ color: "#000" }}>
+            <option
+              value="all"
+              style={{
+                color: "#000000",
+                backgroundColor: "#ffffff",
+              }}
+            >
               All hubs
             </option>
 
@@ -98,7 +107,10 @@ export default function PGsPage() {
               <option
                 key={hub}
                 value={hub}
-                style={{ color: "#000" }}
+                style={{
+                  color: "#000000",
+                  backgroundColor: "#ffffff",
+                }}
               >
                 {hub}
               </option>
@@ -108,11 +120,17 @@ export default function PGsPage() {
       </header>
 
       {/* LOADING */}
-      {loading && <p>Loading PGs…</p>}
+      {loading && (
+        <p style={{ marginTop: "20px", color: "#9ca3af" }}>
+          Loading PGs…
+        </p>
+      )}
 
-      {/* EMPTY */}
+      {/* EMPTY STATE */}
       {!loading && filteredStays.length === 0 && (
-        <p>No PGs found.</p>
+        <p style={{ marginTop: "20px", color: "#9ca3af" }}>
+          No PGs found for this hub.
+        </p>
       )}
 
       {/* PG CARDS */}
@@ -124,16 +142,16 @@ export default function PGsPage() {
                 <span className="pg-tag">{stay.tag}</span>
               )}
 
-              <h3>{stay.name}</h3>
+              <h3 className="pg-title">{stay.name}</h3>
 
               {stay.hub && (
-                <p style={{ color: "#93c5fd" }}>
+                <p style={{ color: "#93c5fd", marginBottom: "6px" }}>
                   📍 {stay.hub}
                 </p>
               )}
 
               {stay.description && (
-                <p>{stay.description}</p>
+                <p className="pg-desc">{stay.description}</p>
               )}
 
               {stay.maps_url && (
@@ -141,6 +159,7 @@ export default function PGsPage() {
                   href={stay.maps_url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="map-link"
                 >
                   View on Google Maps →
                 </a>
