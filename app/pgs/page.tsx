@@ -10,7 +10,6 @@ type Stay = {
   tag: string | null;
   maps_url: string | null;
   hub: string | null;
-  type: "pg" | "rental" | null;
 };
 
 const normalizeHub = (hub: string) => hub.trim().toLowerCase();
@@ -18,7 +17,7 @@ const normalizeHub = (hub: string) => hub.trim().toLowerCase();
 export default function PGsPage() {
   const [stays, setStays] = useState<Stay[]>([]);
   const [selectedHub, setSelectedHub] = useState("all");
-  const [activeType, setActiveType] = useState<"pg" | "rental">("pg");
+  const [activeTab, setActiveTab] = useState<"pg" | "rental">("pg");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +28,7 @@ export default function PGsPage() {
 
       const { data } = await supabase
         .from("pgs_rentals")
-        .select("id, name, description, tag, maps_url, hub, type")
+        .select("id, name, description, tag, maps_url, hub")
         .order("priority", { ascending: false });
 
       setStays(data || []);
@@ -39,25 +38,21 @@ export default function PGsPage() {
     fetchStays();
   }, []);
 
-  /* HUB LIST (BASED ON ACTIVE TAB) */
+  /* HUB LIST */
   const hubs = Array.from(
     new Set(
       stays
-        .filter((s) => (s.type ?? "pg") === activeType)
         .map((s) => s.hub)
         .filter(Boolean)
         .map((h) => h!.trim())
     )
   );
 
-  /* FILTER STAYS */
+  /* FILTER PGs ONLY */
   const filteredStays = stays.filter((stay) => {
-    const stayType = stay.type ?? "pg";
-    if (stayType !== activeType) return false;
+    if (activeTab === "rental") return false;
     if (!stay.hub) return false;
-
     if (selectedHub === "all") return true;
-
     return normalizeHub(stay.hub) === normalizeHub(selectedHub);
   });
 
@@ -70,9 +65,9 @@ export default function PGsPage() {
         {/* TABS */}
         <div className="type-tabs">
           <button
-            className={`type-tab ${activeType === "pg" ? "active" : ""}`}
+            className={`type-tab ${activeTab === "pg" ? "active" : ""}`}
             onClick={() => {
-              setActiveType("pg");
+              setActiveTab("pg");
               setSelectedHub("all");
             }}
           >
@@ -80,17 +75,15 @@ export default function PGsPage() {
           </button>
 
           <button
-            className={`type-tab ${activeType === "rental" ? "active" : ""}`}
-            onClick={() => {
-              setActiveType("rental");
-              setSelectedHub("all");
-            }}
+            className="type-tab disabled"
+            onClick={() => setActiveTab("rental")}
+            title="Coming soon"
           >
-            Rentals
+            Rentals (Coming soon)
           </button>
         </div>
 
-        {/* CUSTOM DARK DROPDOWN */}
+        {/* CUSTOM DROPDOWN */}
         <div className="dropdown">
           <label>Select IT hub</label>
 
@@ -132,13 +125,17 @@ export default function PGsPage() {
       </header>
 
       {/* STATES */}
-      {!loading && filteredStays.length === 0 && (
+      {activeTab === "rental" && (
         <p className="empty-state">
-          No {activeType === "pg" ? "PGs" : "rentals"} found.
+          Rentals are coming soon 🚧
         </p>
       )}
 
-      {!loading && filteredStays.length > 0 && (
+      {activeTab === "pg" && !loading && filteredStays.length === 0 && (
+        <p className="empty-state">No PGs found.</p>
+      )}
+
+      {activeTab === "pg" && !loading && filteredStays.length > 0 && (
         <section className="card-grid">
           {filteredStays.map((stay) => (
             <div key={stay.id} className="card pg-card">
