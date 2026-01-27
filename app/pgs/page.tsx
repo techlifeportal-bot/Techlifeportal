@@ -10,7 +10,7 @@ type Stay = {
   tag: string | null;
   maps_url: string | null;
   hub: string | null;
-  type: "pg" | "rental";
+  type: "pg" | "rental" | null;
 };
 
 const HIDDEN_HUBS = ["outer ring road", "orr"];
@@ -34,20 +34,29 @@ export default function PGsPage() {
         .select("id, name, description, tag, maps_url, hub, type")
         .order("priority", { ascending: false });
 
-      if (!error) setStays(data || []);
+      if (!error) {
+        setStays(data || []);
+      }
+
       setLoading(false);
     };
 
     fetchStays();
   }, []);
 
-  /* Build unique hub list */
+  /* ---------------- HUB LIST (BASED ON ACTIVE TAB) ---------------- */
+
   const hubMap = new Map<string, string>();
 
   stays.forEach((stay) => {
+    const stayType = stay.type ?? "pg"; // treat old rows as PGs
+
+    if (stayType !== activeType) return;
     if (!stay.hub) return;
+
     const norm = normalizeHub(stay.hub);
     if (HIDDEN_HUBS.includes(norm)) return;
+
     if (!hubMap.has(norm)) {
       hubMap.set(norm, stay.hub.trim());
     }
@@ -55,9 +64,12 @@ export default function PGsPage() {
 
   const hubs = Array.from(hubMap.values());
 
-  /* Filter stays by type + hub */
+  /* ---------------- FILTERED STAYS ---------------- */
+
   const filteredStays = stays.filter((stay) => {
-    if (stay.type !== activeType) return false;
+    const stayType = stay.type ?? "pg";
+
+    if (stayType !== activeType) return false;
 
     if (selectedHub === "all") {
       return stay.hub && !HIDDEN_HUBS.includes(normalizeHub(stay.hub));
@@ -80,14 +92,20 @@ export default function PGsPage() {
         <div className="type-tabs">
           <button
             className={`type-tab ${activeType === "pg" ? "active" : ""}`}
-            onClick={() => setActiveType("pg")}
+            onClick={() => {
+              setActiveType("pg");
+              setSelectedHub("all");
+            }}
           >
             PGs
           </button>
 
           <button
             className={`type-tab ${activeType === "rental" ? "active" : ""}`}
-            onClick={() => setActiveType("rental")}
+            onClick={() => {
+              setActiveType("rental");
+              setSelectedHub("all");
+            }}
           >
             Rentals
           </button>
