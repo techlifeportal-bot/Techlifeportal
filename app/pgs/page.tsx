@@ -19,29 +19,24 @@ export default function PGsPage() {
   const [selectedHub, setSelectedHub] = useState("all");
   const [loading, setLoading] = useState(true);
 
-  /* ---------------- FETCH PGs ---------------- */
-
+  /* FETCH DATA */
   useEffect(() => {
     const fetchStays = async () => {
       setLoading(true);
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("pgs_rentals")
         .select("id, name, description, tag, maps_url, hub")
         .order("priority", { ascending: false });
 
-      if (!error && data) {
-        setStays(data);
-      }
-
+      setStays(data || []);
       setLoading(false);
     };
 
     fetchStays();
   }, []);
 
-  /* ---------------- BUILD HUB LIST ---------------- */
-
+  /* HUB LIST */
   const hubs = Array.from(
     new Set(
       stays
@@ -51,17 +46,12 @@ export default function PGsPage() {
     )
   );
 
-  /* ---------------- FILTER PGs ---------------- */
-
+  /* FILTER */
   const filteredStays = stays.filter((stay) => {
     if (!stay.hub) return false;
-
     if (selectedHub === "all") return true;
-
     return normalizeHub(stay.hub) === normalizeHub(selectedHub);
   });
-
-  /* ---------------- UI ---------------- */
 
   return (
     <main className="page-container">
@@ -69,7 +59,7 @@ export default function PGsPage() {
         <h1>PGs & Rentals</h1>
         <p>Find stays near your IT hub.</p>
 
-        {/* HUB FILTER (INLINE STYLES – FINAL FIX) */}
+        {/* HUB SELECT */}
         <div style={{ marginTop: "16px" }}>
           <label
             style={{
@@ -84,34 +74,11 @@ export default function PGsPage() {
           <select
             value={selectedHub}
             onChange={(e) => setSelectedHub(e.target.value)}
-            style={{
-              backgroundColor: "#0b1220",
-              color: "#ffffff",
-              padding: "10px",
-              borderRadius: "8px",
-              border: "1px solid rgba(255,255,255,0.3)",
-              minWidth: "240px",
-            }}
+            className="dark-select"
           >
-            <option
-              value="all"
-              style={{
-                color: "#000000",
-                backgroundColor: "#ffffff",
-              }}
-            >
-              All hubs
-            </option>
-
+            <option value="all">All hubs</option>
             {hubs.map((hub) => (
-              <option
-                key={hub}
-                value={hub}
-                style={{
-                  color: "#000000",
-                  backgroundColor: "#ffffff",
-                }}
-              >
+              <option key={hub} value={hub}>
                 {hub}
               </option>
             ))}
@@ -120,20 +87,14 @@ export default function PGsPage() {
       </header>
 
       {/* LOADING */}
-      {loading && (
-        <p style={{ marginTop: "20px", color: "#9ca3af" }}>
-          Loading PGs…
-        </p>
-      )}
+      {loading && <p style={{ marginTop: "20px" }}>Loading PGs…</p>}
 
-      {/* EMPTY STATE */}
+      {/* EMPTY */}
       {!loading && filteredStays.length === 0 && (
-        <p style={{ marginTop: "20px", color: "#9ca3af" }}>
-          No PGs found for this hub.
-        </p>
+        <p style={{ marginTop: "20px" }}>No PGs found.</p>
       )}
 
-      {/* PG CARDS */}
+      {/* CARDS */}
       {!loading && filteredStays.length > 0 && (
         <section className="card-grid">
           {filteredStays.map((stay) => (
@@ -145,9 +106,7 @@ export default function PGsPage() {
               <h3 className="pg-title">{stay.name}</h3>
 
               {stay.hub && (
-                <p style={{ color: "#93c5fd", marginBottom: "6px" }}>
-                  📍 {stay.hub}
-                </p>
+                <p className="pg-hub">📍 {stay.hub}</p>
               )}
 
               {stay.description && (
