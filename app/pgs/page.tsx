@@ -41,16 +41,20 @@ export default function PGsPage() {
 
   const [submitted, setSubmitted] = useState(false);
 
-  /* ---------------- FETCH DATA ---------------- */
+  /* ---------------- FETCH PG DATA ---------------- */
 
   useEffect(() => {
     const fetchStays = async () => {
       setLoading(true);
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("pgs_rentals")
         .select("id, name, description, tag, maps_url, hub")
         .order("priority", { ascending: false });
+
+      if (error) {
+        console.log("PG Fetch Error:", error);
+      }
 
       setStays(data || []);
       setLoading(false);
@@ -96,37 +100,35 @@ export default function PGsPage() {
     });
   };
 
-  /* ---------------- SUBMIT DEMO ENQUIRY ---------------- */
+  /* ---------------- SUBMIT ENQUIRY (SUPABASE DEMO TABLE) ---------------- */
 
- const handleSubmit = async () => {
-  if (!selectedPG) return;
+  const handleSubmit = async () => {
+    if (!selectedPG) return;
 
-  // Insert enquiry into demo table
-  const { error } = await supabase.from("pg_enquiries_demo").insert([
-    {
-      pg_id: selectedPG.id,
-      pg_name: selectedPG.name,
+    const { error } = await supabase.from("pg_enquiries_demo").insert([
+      {
+        pg_id: selectedPG.id,
+        pg_name: selectedPG.name,
 
-      user_name: formData.name,
-      phone: formData.phone,
-      move_in: formData.moveIn,
-      message: formData.message,
-    },
-  ]);
+        user_name: formData.name,
+        phone: formData.phone,
+        move_in: formData.moveIn,
+        message: formData.message,
+      },
+    ]);
 
-  if (error) {
-    alert("Something went wrong. Try again.");
-    console.error(error);
-    return;
-  }
+    if (error) {
+      alert("Insert failed: " + error.message);
+      console.log("FULL ERROR:", error);
+      return;
+    }
 
-  setSubmitted(true);
+    setSubmitted(true);
 
-  setTimeout(() => {
-    setShowEnquiry(false);
-  }, 1800);
-};
-
+    setTimeout(() => {
+      setShowEnquiry(false);
+    }, 1800);
+  };
 
   /* ---------------- UI ---------------- */
 
@@ -158,7 +160,7 @@ export default function PGsPage() {
           </button>
         </div>
 
-        {/* DROPDOWN */}
+        {/* HUB DROPDOWN */}
         <div className="dropdown">
           <label>Select IT hub</label>
 
@@ -290,7 +292,10 @@ export default function PGsPage() {
                 />
 
                 <div className="modal-actions">
-                  <button className="btn-secondary" onClick={() => setShowEnquiry(false)}>
+                  <button
+                    className="btn-secondary"
+                    onClick={() => setShowEnquiry(false)}
+                  >
                     Cancel
                   </button>
 
