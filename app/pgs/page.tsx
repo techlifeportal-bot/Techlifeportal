@@ -105,21 +105,28 @@ export default function PGsPage() {
   const handleSubmit = async () => {
     if (!selectedPG) return;
 
-    const { error } = await supabase.from("pg_enquiries_demo").insert([
-      {
-        pg_id: selectedPG.id,
-        pg_name: selectedPG.name,
+    const { data, error } = await supabase
+      .from("pg_enquiries_demo")
+      .insert([
+        {
+          pg_id: selectedPG.id,
+          pg_name: selectedPG.name,
 
-        user_name: formData.name,
-        phone: formData.phone,
-        move_in: formData.moveIn,
-        message: formData.message,
-      },
-    ]);
+          user_name: formData.name,
+          phone: formData.phone,
+          move_in: formData.moveIn,
+          message: formData.message,
+        },
+      ])
+      .select(); // ✅ IMPORTANT
+
+    console.log("========== SUPABASE INSERT RESULT ==========");
+    console.log("Inserted Data:", data);
+    console.log("Insert Error:", error);
+    console.log("===========================================");
 
     if (error) {
       alert("Insert failed: " + error.message);
-      console.log("FULL ERROR:", error);
       return;
     }
 
