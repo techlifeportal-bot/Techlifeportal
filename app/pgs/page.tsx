@@ -98,18 +98,35 @@ export default function PGsPage() {
 
   /* ---------------- SUBMIT DEMO ENQUIRY ---------------- */
 
-  const handleSubmit = () => {
-    console.log("📩 Demo Enquiry Submitted:", {
-      pg: selectedPG?.name,
-      ...formData,
-    });
+ const handleSubmit = async () => {
+  if (!selectedPG) return;
 
-    setSubmitted(true);
+  // Insert enquiry into demo table
+  const { error } = await supabase.from("pg_enquiries_demo").insert([
+    {
+      pg_id: selectedPG.id,
+      pg_name: selectedPG.name,
 
-    setTimeout(() => {
-      setShowEnquiry(false);
-    }, 1800);
-  };
+      user_name: formData.name,
+      phone: formData.phone,
+      move_in: formData.moveIn,
+      message: formData.message,
+    },
+  ]);
+
+  if (error) {
+    alert("Something went wrong. Try again.");
+    console.error(error);
+    return;
+  }
+
+  setSubmitted(true);
+
+  setTimeout(() => {
+    setShowEnquiry(false);
+  }, 1800);
+};
+
 
   /* ---------------- UI ---------------- */
 
