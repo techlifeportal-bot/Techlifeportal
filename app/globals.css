@@ -1869,3 +1869,91 @@ select option {
   color: #93c5fd;
   margin-bottom: 6px;
 }
+/* ===== ENQUIRY BUTTON ===== */
+.enquiry-btn {
+  margin-top: 14px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(120, 180, 255, 0.3);
+  background: rgba(30, 80, 180, 0.25);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.enquiry-btn:hover {
+  background: rgba(50, 120, 255, 0.35);
+}
+
+/* ===== MODAL POPUP ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-box {
+  width: 420px;
+  max-width: 90%;
+  background: #0b1220;
+  border: 1px solid rgba(120, 180, 255, 0.2);
+  padding: 22px;
+  border-radius: 18px;
+}
+
+.modal-box h2 {
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+
+.modal-box input,
+.modal-box textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.modal-box textarea {
+  min-height: 70px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.btn-secondary {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  cursor: pointer;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(50, 140, 255, 0.55);
+  color: white;
+  cursor: pointer;
+}
+
+.success-msg {
+  color: #4cff9b;
+  font-weight: 600;
+}

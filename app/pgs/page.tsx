@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
+/* ---------------- TYPES ---------------- */
+
 type Stay = {
   id: string;
   name: string;
@@ -14,14 +16,33 @@ type Stay = {
 
 const normalizeHub = (hub: string) => hub.trim().toLowerCase();
 
+/* ---------------- PAGE ---------------- */
+
 export default function PGsPage() {
   const [stays, setStays] = useState<Stay[]>([]);
   const [selectedHub, setSelectedHub] = useState("all");
+
   const [activeTab, setActiveTab] = useState<"pg" | "rental">("pg");
-  const [open, setOpen] = useState(false);
+
+  const [openDropdown, setOpenDropdown] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  /* FETCH DATA */
+  /* ---------------- ENQUIRY POPUP STATE ---------------- */
+
+  const [showEnquiry, setShowEnquiry] = useState(false);
+  const [selectedPG, setSelectedPG] = useState<Stay | null>(null);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    moveIn: "",
+    message: "",
+  });
+
+  const [submitted, setSubmitted] = useState(false);
+
+  /* ---------------- FETCH DATA ---------------- */
+
   useEffect(() => {
     const fetchStays = async () => {
       setLoading(true);
@@ -38,7 +59,8 @@ export default function PGsPage() {
     fetchStays();
   }, []);
 
-  /* HUB LIST */
+  /* ---------------- HUB LIST ---------------- */
+
   const hubs = Array.from(
     new Set(
       stays
@@ -48,16 +70,52 @@ export default function PGsPage() {
     )
   );
 
-  /* FILTER PGs ONLY */
+  /* ---------------- FILTER PGs ONLY ---------------- */
+
   const filteredStays = stays.filter((stay) => {
     if (activeTab === "rental") return false;
     if (!stay.hub) return false;
+
     if (selectedHub === "all") return true;
+
     return normalizeHub(stay.hub) === normalizeHub(selectedHub);
   });
 
+  /* ---------------- OPEN ENQUIRY POPUP ---------------- */
+
+  const openEnquiryPopup = (pg: Stay) => {
+    setSelectedPG(pg);
+    setShowEnquiry(true);
+    setSubmitted(false);
+
+    setFormData({
+      name: "",
+      phone: "",
+      moveIn: "",
+      message: "",
+    });
+  };
+
+  /* ---------------- SUBMIT DEMO ENQUIRY ---------------- */
+
+  const handleSubmit = () => {
+    console.log("📩 Demo Enquiry Submitted:", {
+      pg: selectedPG?.name,
+      ...formData,
+    });
+
+    setSubmitted(true);
+
+    setTimeout(() => {
+      setShowEnquiry(false);
+    }, 1800);
+  };
+
+  /* ---------------- UI ---------------- */
+
   return (
     <main className="page-container">
+      {/* HEADER */}
       <header className="page-header">
         <h1>PGs & Rentals</h1>
         <p>Find stays near your IT hub.</p>
@@ -76,32 +134,32 @@ export default function PGsPage() {
 
           <button
             className="type-tab disabled"
-            onClick={() => setActiveTab("rental")}
             title="Coming soon"
+            onClick={() => setActiveTab("rental")}
           >
             Rentals (Coming soon)
           </button>
         </div>
 
-        {/* CUSTOM DROPDOWN */}
+        {/* DROPDOWN */}
         <div className="dropdown">
           <label>Select IT hub</label>
 
           <button
             className="dropdown-trigger"
-            onClick={() => setOpen(!open)}
+            onClick={() => setOpenDropdown(!openDropdown)}
           >
             {selectedHub === "all" ? "All hubs" : selectedHub}
             <span className="arrow">▾</span>
           </button>
 
-          {open && (
+          {openDropdown && (
             <div className="dropdown-menu">
               <div
                 className="dropdown-item"
                 onClick={() => {
                   setSelectedHub("all");
-                  setOpen(false);
+                  setOpenDropdown(false);
                 }}
               >
                 All hubs
@@ -113,7 +171,7 @@ export default function PGsPage() {
                   className="dropdown-item"
                   onClick={() => {
                     setSelectedHub(hub);
-                    setOpen(false);
+                    setOpenDropdown(false);
                   }}
                 >
                   {hub}
@@ -124,17 +182,17 @@ export default function PGsPage() {
         </div>
       </header>
 
-      {/* STATES */}
+      {/* RENTALS COMING SOON */}
       {activeTab === "rental" && (
-        <p className="empty-state">
-          Rentals are coming soon 🚧
-        </p>
+        <p className="empty-state">Rentals are coming soon 🚧</p>
       )}
 
+      {/* EMPTY */}
       {activeTab === "pg" && !loading && filteredStays.length === 0 && (
         <p className="empty-state">No PGs found.</p>
       )}
 
+      {/* PG CARDS */}
       {activeTab === "pg" && !loading && filteredStays.length > 0 && (
         <section className="card-grid">
           {filteredStays.map((stay) => (
@@ -143,13 +201,19 @@ export default function PGsPage() {
 
               <h3 className="pg-title">{stay.name}</h3>
 
-              {stay.hub && (
-                <p className="pg-hub">📍 {stay.hub}</p>
-              )}
+              {stay.hub && <p className="pg-hub">📍 {stay.hub}</p>}
 
               {stay.description && (
                 <p className="pg-desc">{stay.description}</p>
               )}
+
+              {/* CONTACT BUTTON */}
+              <button
+                className="enquiry-btn"
+                onClick={() => openEnquiryPopup(stay)}
+              >
+                Contact via TechLifePortal
+              </button>
 
               {stay.maps_url && (
                 <a
@@ -164,6 +228,63 @@ export default function PGsPage() {
             </div>
           ))}
         </section>
+      )}
+
+      {/* ENQUIRY POPUP MODAL */}
+      {showEnquiry && selectedPG && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h2>Enquiry for {selectedPG.name}</h2>
+
+            {submitted ? (
+              <p className="success-msg">✅ Enquiry submitted!</p>
+            ) : (
+              <>
+                <input
+                  placeholder="Your name"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                />
+
+                <input
+                  placeholder="Phone number"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                />
+
+                <input
+                  type="date"
+                  value={formData.moveIn}
+                  onChange={(e) =>
+                    setFormData({ ...formData, moveIn: e.target.value })
+                  }
+                />
+
+                <textarea
+                  placeholder="Message (optional)"
+                  value={formData.message}
+                  onChange={(e) =>
+                    setFormData({ ...formData, message: e.target.value })
+                  }
+                />
+
+                <div className="modal-actions">
+                  <button className="btn-secondary" onClick={() => setShowEnquiry(false)}>
+                    Cancel
+                  </button>
+
+                  <button className="btn-primary" onClick={handleSubmit}>
+                    Submit Enquiry
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       )}
     </main>
   );
