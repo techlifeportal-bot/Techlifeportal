@@ -29,7 +29,7 @@ export default async function AdminLayout({
 
   // Not logged in → send to login
   if (!user) {
-    redirect("/admin/login");
+    redirect("/login");
   }
 
   // Not admin → block
