@@ -1,169 +1,84 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabaseClient";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-type Draft = {
+type Enquiry = {
   id: string;
-  name: string;
-  description: string;
-  location: string;
-  category: string;
+  pg_name: string;
+  user_name: string;
+  phone: string;
+  move_in: string;
+  message: string | null;
+  created_at: string;
 };
 
-const AI_TYPES = [
-  { label: "Weekend Spots", value: "weekend_spots" },
-  { label: "Cafes", value: "cafes" },
-  { label: "Gyms", value: "gyms" },
-  { label: "Companies", value: "companies" },
-  { label: "Jobs", value: "jobs" },
-];
-
-export default function AdminPage() {
-  const [drafts, setDrafts] = useState<Draft[]>([]);
+export default function AdminEnquiriesPage() {
+  const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
-  const [selectedType, setSelectedType] = useState("");
 
-  useEffect(() => {
-    fetchDrafts();
-  }, []);
+  /* FETCH ENQUIRIES */
+  const fetchEnquiries = async () => {
+    setLoading(true);
 
-  const fetchDrafts = async () => {
     const { data, error } = await supabase
-      .from("ai_suggested_spots")
+      .from("pg_enquiries_demo")
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (!error) {
-      setDrafts(data || []);
-    } else {
-      console.error(error);
+    if (error) {
+      console.log("Error fetching enquiries:", error);
     }
 
+    setEnquiries(data || []);
     setLoading(false);
   };
 
-  const generateAISuggestions = async () => {
-    if (!selectedType) {
-      alert("Select AI suggestion type first");
-      return;
-    }
-
-    setGenerating(true);
-
-    try {
-      const res = await fetch("/api/ai/suggest", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: selectedType }),
-      });
-
-      if (!res.ok) throw new Error();
-
-      await fetchDrafts();
-    } catch {
-      alert("Failed to generate AI suggestions");
-    }
-
-    setGenerating(false);
-  };
-
-  const approveDraft = async (draft: Draft) => {
-    const { error } = await supabase
-      .from(draft.category)
-      .insert({
-        name: draft.name,
-        description: draft.description,
-        location: draft.location,
-      });
-
-    if (error) {
-      alert("Failed to approve");
-      return;
-    }
-
-    await supabase
-      .from("ai_suggested_spots")
-      .delete()
-      .eq("id", draft.id);
-
-    fetchDrafts();
-  };
+  useEffect(() => {
+    fetchEnquiries();
+  }, []);
 
   return (
     <main className="admin-page">
       <header className="admin-header">
-        <h1>Admin — AI Draft Review</h1>
-        <p>
-          Automation status: <strong>MANUAL ONLY</strong>
-        </p>
-
-        <div className="admin-ai-control">
-          <select
-            value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value)}
-          >
-            <option value="">Select AI suggestion type</option>
-            {AI_TYPES.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </select>
-
-          <button
-            className="generate-btn"
-            onClick={generateAISuggestions}
-            disabled={generating}
-          >
-            {generating ? "Generating…" : "Generate AI Suggestions"}
-          </button>
-        </div>
+        <h1>Admin — PG Enquiries Inbox</h1>
+        <p>All tenant enquiries submitted via TechLifePortal</p>
       </header>
 
-      {loading && <p>Loading AI drafts…</p>}
+      {loading && <p>Loading enquiries...</p>}
 
-      {!loading && drafts.length === 0 && (
-        <p>No AI drafts pending review.</p>
+      {!loading && enquiries.length === 0 && (
+        <p>No enquiries yet.</p>
       )}
 
       <section className="admin-grid">
-        {drafts.map((draft) => (
-          <div key={draft.id} className="admin-card">
-            <div className="admin-card-header">
-              <h3>{draft.name}</h3>
-              <span className="admin-status">
-                {draft.category.replace("_", " ")}
-              </span>
-            </div>
+        {enquiries.map((enq) => (
+          <div key={enq.id} className="admin-card">
+            <h3>{enq.pg_name}</h3>
 
-            <label>Description</label>
-            <textarea value={draft.description} rows={4} readOnly />
+            <p>
+              <strong>Name:</strong> {enq.user_name}
+            </p>
 
-            <div className="admin-row">
-              <div>
-                <label>Location</label>
-                <input value={draft.location} readOnly />
-              </div>
+            <p>
+              <strong>Phone:</strong> {enq.phone}
+            </p>
 
-              <div>
-                <label>Category</label>
-                <input value={draft.category} readOnly />
-              </div>
-            </div>
+            <p>
+              <strong>Move-in Date:</strong>{" "}
+              {enq.move_in || "Not provided"}
+            </p>
 
-            <button
-              className="approve-btn"
-              onClick={() => approveDraft(draft)}
-            >
-              Approve
-            </button>
+            {enq.message && (
+              <p>
+                <strong>Message:</strong> {enq.message}
+              </p>
+            )}
+
+            <p className="admin-time">
+              Submitted:{" "}
+              {new Date(enq.created_at).toLocaleString()}
+            </p>
           </div>
         ))}
       </section>
