@@ -11,7 +11,8 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/admin/login`);
   }
 
-  const cookieStore = cookies();
+  // ✅ FIX: cookies() must be awaited in Next.js 15+
+  const cookieStore = await cookies();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
