@@ -10,42 +10,31 @@ export default function AdminGuard({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const [checking, setChecking] = useState(true);
+  const [ok, setOk] = useState(false);
 
   useEffect(() => {
-    const checkAdmin = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    const run = async () => {
+      const { data } = await supabase.auth.getSession();
 
-      // ❌ Not logged in
-      if (!session) {
+      if (!data.session) {
         router.push("/admin/login");
         return;
       }
 
-      // ✅ Only allow your email
       const adminEmail = "techlifeportal@gmail.com";
 
-      if (session.user.email !== adminEmail) {
-        alert("Not authorized");
+      if (data.session.user.email !== adminEmail) {
         router.push("/");
         return;
       }
 
-      setChecking(false);
+      setOk(true);
     };
 
-    checkAdmin();
+    run();
   }, [router]);
 
-  if (checking) {
-    return (
-      <p style={{ padding: 40, textAlign: "center" }}>
-        Checking admin access...
-      </p>
-    );
-  }
+  if (!ok) return <p style={{ padding: 40 }}>Checking admin...</p>;
 
   return <>{children}</>;
 }
