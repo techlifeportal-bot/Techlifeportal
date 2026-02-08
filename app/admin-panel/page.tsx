@@ -53,9 +53,7 @@ export default function AdminPanel() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.log("Fetch error:", error);
-    }
+    if (error) console.log("Fetch error:", error);
 
     setEnquiries(data || []);
     setLoading(false);
@@ -72,11 +70,23 @@ export default function AdminPanel() {
   };
 
   return (
-    <main style={{ padding: 40 }}>
-      <h1>✅ Admin Panel — Enquiries</h1>
-      <p>Manage tenant enquiries</p>
+    <main
+      style={{
+        padding: "50px",
+        minHeight: "100vh",
+        background: "transparent",
+        color: "white",
+      }}
+    >
+      <h1 style={{ fontSize: "32px", fontWeight: "bold" }}>
+        Admin Panel — Enquiries
+      </h1>
 
-      <hr style={{ margin: "20px 0" }} />
+      <p style={{ opacity: 0.7 }}>
+        Track tenant enquiries and mark them as contacted.
+      </p>
+
+      <hr style={{ margin: "25px 0", opacity: 0.2 }} />
 
       {loading && <p>Loading enquiries...</p>}
 
@@ -89,51 +99,68 @@ export default function AdminPanel() {
           <div
             key={enq.id}
             style={{
-              border: "1px solid #ddd",
-              padding: 15,
-              borderRadius: 10,
-              marginBottom: 15,
+              marginBottom: "20px",
+              padding: "20px",
+              borderRadius: "16px",
               background:
                 enq.status === "contacted"
-                  ? "#f0fdf4"
-                  : "white",
+                  ? "rgba(34,197,94,0.15)"
+                  : "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              backdropFilter: "blur(10px)",
             }}
           >
-            <h3>{enq.pg_name}</h3>
+            {/* PG NAME */}
+            <h2 style={{ fontSize: "20px", fontWeight: "600" }}>
+              {enq.pg_name}
+            </h2>
 
-            <p>
+            {/* DETAILS */}
+            <p style={{ marginTop: "8px", opacity: 0.9 }}>
               <strong>Name:</strong> {enq.user_name}
             </p>
 
-            <p>
+            <p style={{ opacity: 0.9 }}>
               <strong>Phone:</strong> {enq.phone}
             </p>
 
-            <p>
+            <p style={{ opacity: 0.9 }}>
               <strong>Status:</strong>{" "}
-              <span style={{ fontWeight: "bold" }}>
+              <span
+                style={{
+                  fontWeight: "bold",
+                  color:
+                    enq.status === "contacted"
+                      ? "#22c55e"
+                      : "#facc15",
+                }}
+              >
                 {enq.status}
               </span>
             </p>
 
+            {/* BUTTON */}
             {enq.status !== "contacted" && (
               <button
                 onClick={() => markContacted(enq.id)}
                 style={{
-                  marginTop: 10,
-                  padding: "8px 12px",
-                  borderRadius: 6,
-                  background: "black",
-                  color: "white",
+                  marginTop: "12px",
+                  padding: "10px 16px",
+                  borderRadius: "10px",
+                  background: "white",
+                  color: "black",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  border: "none",
                 }}
               >
                 Mark as Contacted
               </button>
             )}
 
-            <p style={{ fontSize: 12, opacity: 0.6 }}>
-              Submitted:{" "}
-              {new Date(enq.created_at).toLocaleString()}
+            {/* DATE */}
+            <p style={{ marginTop: "10px", fontSize: "12px", opacity: 0.5 }}>
+              Submitted: {new Date(enq.created_at).toLocaleString()}
             </p>
           </div>
         ))}
