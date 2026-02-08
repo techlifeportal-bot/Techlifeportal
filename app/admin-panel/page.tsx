@@ -13,6 +13,7 @@ type Enquiry = {
   phone: string;
   move_in: string;
   message: string | null;
+  status: string;
   created_at: string;
 };
 
@@ -60,10 +61,20 @@ export default function AdminPanel() {
     setLoading(false);
   };
 
+  // ✅ Mark Contacted
+  const markContacted = async (id: string) => {
+    await supabase
+      .from("pg_enquiries_demo")
+      .update({ status: "contacted" })
+      .eq("id", id);
+
+    fetchEnquiries();
+  };
+
   return (
     <main style={{ padding: 40 }}>
-      <h1>✅ Admin Panel</h1>
-      <p>Welcome Krishna. These are the latest PG enquiries.</p>
+      <h1>✅ Admin Panel — Enquiries</h1>
+      <p>Manage tenant enquiries</p>
 
       <hr style={{ margin: "20px 0" }} />
 
@@ -82,6 +93,10 @@ export default function AdminPanel() {
               padding: 15,
               borderRadius: 10,
               marginBottom: 15,
+              background:
+                enq.status === "contacted"
+                  ? "#f0fdf4"
+                  : "white",
             }}
           >
             <h3>{enq.pg_name}</h3>
@@ -95,14 +110,25 @@ export default function AdminPanel() {
             </p>
 
             <p>
-              <strong>Move-in:</strong>{" "}
-              {enq.move_in || "Not provided"}
+              <strong>Status:</strong>{" "}
+              <span style={{ fontWeight: "bold" }}>
+                {enq.status}
+              </span>
             </p>
 
-            {enq.message && (
-              <p>
-                <strong>Message:</strong> {enq.message}
-              </p>
+            {enq.status !== "contacted" && (
+              <button
+                onClick={() => markContacted(enq.id)}
+                style={{
+                  marginTop: 10,
+                  padding: "8px 12px",
+                  borderRadius: 6,
+                  background: "black",
+                  color: "white",
+                }}
+              >
+                Mark as Contacted
+              </button>
             )}
 
             <p style={{ fontSize: 12, opacity: 0.6 }}>
