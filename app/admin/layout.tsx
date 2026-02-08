@@ -27,12 +27,10 @@ export default async function AdminLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Not logged in → send to login
   if (!user) {
     redirect("/login");
   }
 
-  // Not admin → block
   if (user.email !== ADMIN_EMAIL) {
     redirect("/");
   }

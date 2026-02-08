@@ -4,14 +4,12 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
-
   const code = searchParams.get("code");
 
   if (!code) {
-    return NextResponse.redirect(`${origin}/admin/login`);
+    return NextResponse.redirect(`${origin}/login`);
   }
 
-  // ✅ FIX: cookies() must be awaited in Next.js 15+
   const cookieStore = await cookies();
 
   const supabase = createServerClient(
@@ -32,9 +30,7 @@ export async function GET(request: Request) {
     }
   );
 
-  // Exchange magic link code for session cookie
   await supabase.auth.exchangeCodeForSession(code);
 
-  // Redirect into admin panel
   return NextResponse.redirect(`${origin}/admin`);
 }
