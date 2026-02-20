@@ -9,6 +9,7 @@ export default function OwnerDashboard() {
 
   const [loading, setLoading] = useState(true);
   const [profileComplete, setProfileComplete] = useState(false);
+
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
 
@@ -16,6 +17,7 @@ export default function OwnerDashboard() {
   const [hub, setHub] = useState("");
   const [location, setLocation] = useState("");
   const [mapsUrl, setMapsUrl] = useState("");
+
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -29,11 +31,15 @@ export default function OwnerDashboard() {
 
       const userId = sessionData.session.user.id;
 
-      const { data: ownerData } = await supabase
+      const { data: ownerData, error } = await supabase
         .from("pg_owners")
         .select("name, phone")
         .eq("id", userId)
         .single();
+
+      if (error) {
+        console.log("Profile fetch error:", error);
+      }
 
       if (ownerData?.name && ownerData?.phone) {
         setName(ownerData.name);
@@ -51,9 +57,12 @@ export default function OwnerDashboard() {
     const { data: sessionData } = await supabase.auth.getSession();
     const userId = sessionData.session?.user.id;
 
-    if (!userId) return;
+    if (!userId) {
+      setMessage("No user session found.");
+      return;
+    }
 
-    await supabase.from("pg_owners").upsert(
+    const { error } = await supabase.from("pg_owners").upsert(
       {
         id: userId,
         name,
@@ -62,21 +71,31 @@ export default function OwnerDashboard() {
       { onConflict: "id" }
     );
 
+    if (error) {
+      console.log("Profile save error:", error);
+      setMessage(`❌ ${error.message}`);
+      return;
+    }
+
     setProfileComplete(true);
+    setMessage("✅ Profile saved successfully.");
   };
 
   const handleListingSubmit = async () => {
     const { data: sessionData } = await supabase.auth.getSession();
     const userId = sessionData.session?.user.id;
 
-    if (!userId) return;
+    if (!userId) {
+      setMessage("No user session found.");
+      return;
+    }
 
-    const { error } = await supabase.from("pgs_rentals").insert([
+    const { data, error } = await supabase.from("pgs_rentals").insert([
       {
         pg_name: pgName,
         hub,
         location,
-        maps_url: mapsUrl,
+        maps_url: mapsUrl || null,
         owner_name: name,
         owner_phone: phone,
         owner_id: userId,
@@ -84,15 +103,20 @@ export default function OwnerDashboard() {
       },
     ]);
 
+    console.log("Insert result:", data);
+    console.log("Insert error:", error);
+
     if (error) {
-      setMessage("❌ Failed to submit listing.");
-    } else {
-      setMessage("✅ Listing submitted. Awaiting approval.");
-      setPgName("");
-      setHub("");
-      setLocation("");
-      setMapsUrl("");
+      setMessage(`❌ ${error.message}`);
+      return;
     }
+
+    setMessage("✅ Listing submitted. Awaiting approval.");
+
+    setPgName("");
+    setHub("");
+    setLocation("");
+    setMapsUrl("");
   };
 
   if (loading) {
@@ -131,6 +155,8 @@ export default function OwnerDashboard() {
           >
             Save Profile
           </button>
+
+          {message && <p style={{ marginTop: 12 }}>{message}</p>}
         </section>
       </main>
     );
