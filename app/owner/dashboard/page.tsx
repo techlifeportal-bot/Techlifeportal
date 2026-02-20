@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -77,12 +76,20 @@ export default function OwnerDashboard() {
 
     const { error } = await supabase.from("pgs_rentals").insert([
       {
-        pg_name: pgName,
-        hub,
-        location,
+        name: pgName,
+        hub: hub,
+        location: location,
         maps_url: mapsUrl || null,
-        owner_id: userId,
         status: "pending",
+        source: "owner",
+        type: "pg",
+        owner_id: userId,
+        description: null,
+        tag: null,
+        ai_summary: null,
+        priority: null,
+        notes: null,
+        last_verified_at: null,
       },
     ]);
 
@@ -114,16 +121,10 @@ export default function OwnerDashboard() {
 
         <section className="card" style={{ maxWidth: 400 }}>
           <label>Your Name</label>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+          <input value={name} onChange={(e) => setName(e.target.value)} />
 
           <label>Phone Number</label>
-          <input
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
+          <input value={phone} onChange={(e) => setPhone(e.target.value)} />
 
           <button
             onClick={handleProfileSave}
