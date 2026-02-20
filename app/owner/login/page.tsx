@@ -1,12 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 export default function OwnerLoginPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        router.push("/owner/dashboard");
+      }
+    };
+
+    checkSession();
+  }, [router]);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -14,6 +27,9 @@ export default function OwnerLoginPage() {
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/owner/dashboard`,
+      },
     });
 
     if (error) {
