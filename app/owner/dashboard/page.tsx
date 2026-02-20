@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -31,15 +32,11 @@ export default function OwnerDashboard() {
 
       const userId = sessionData.session.user.id;
 
-      const { data: ownerData, error } = await supabase
+      const { data: ownerData } = await supabase
         .from("pg_owners")
         .select("name, phone")
         .eq("id", userId)
         .single();
-
-      if (error) {
-        console.log("Profile fetch error:", error);
-      }
 
       if (ownerData?.name && ownerData?.phone) {
         setName(ownerData.name);
@@ -57,12 +54,9 @@ export default function OwnerDashboard() {
     const { data: sessionData } = await supabase.auth.getSession();
     const userId = sessionData.session?.user.id;
 
-    if (!userId) {
-      setMessage("No user session found.");
-      return;
-    }
+    if (!userId) return;
 
-    const { error } = await supabase.from("pg_owners").upsert(
+    await supabase.from("pg_owners").upsert(
       {
         id: userId,
         name,
@@ -71,40 +65,26 @@ export default function OwnerDashboard() {
       { onConflict: "id" }
     );
 
-    if (error) {
-      console.log("Profile save error:", error);
-      setMessage(`❌ ${error.message}`);
-      return;
-    }
-
     setProfileComplete(true);
-    setMessage("✅ Profile saved successfully.");
+    setMessage("✅ Profile saved.");
   };
 
   const handleListingSubmit = async () => {
     const { data: sessionData } = await supabase.auth.getSession();
     const userId = sessionData.session?.user.id;
 
-    if (!userId) {
-      setMessage("No user session found.");
-      return;
-    }
+    if (!userId) return;
 
-    const { data, error } = await supabase.from("pgs_rentals").insert([
+    const { error } = await supabase.from("pgs_rentals").insert([
       {
         pg_name: pgName,
         hub,
         location,
         maps_url: mapsUrl || null,
-        owner_name: name,
-        owner_phone: phone,
         owner_id: userId,
         status: "pending",
       },
     ]);
-
-    console.log("Insert result:", data);
-    console.log("Insert error:", error);
 
     if (error) {
       setMessage(`❌ ${error.message}`);
@@ -137,14 +117,12 @@ export default function OwnerDashboard() {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Your full name"
           />
 
           <label>Phone Number</label>
           <input
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="WhatsApp number"
           />
 
           <button
@@ -170,28 +148,16 @@ export default function OwnerDashboard() {
         <h3>Add New PG Listing</h3>
 
         <label>PG Name</label>
-        <input
-          value={pgName}
-          onChange={(e) => setPgName(e.target.value)}
-        />
+        <input value={pgName} onChange={(e) => setPgName(e.target.value)} />
 
         <label>IT Hub</label>
-        <input
-          value={hub}
-          onChange={(e) => setHub(e.target.value)}
-        />
+        <input value={hub} onChange={(e) => setHub(e.target.value)} />
 
         <label>Location</label>
-        <input
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-        />
+        <input value={location} onChange={(e) => setLocation(e.target.value)} />
 
         <label>Google Maps URL</label>
-        <input
-          value={mapsUrl}
-          onChange={(e) => setMapsUrl(e.target.value)}
-        />
+        <input value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} />
 
         <button
           onClick={handleListingSubmit}
