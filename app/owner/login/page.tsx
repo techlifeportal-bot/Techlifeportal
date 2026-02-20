@@ -11,6 +11,7 @@ export default function OwnerLoginPage() {
   const router = useRouter();
 
   useEffect(() => {
+    // If already logged in, go to dashboard
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
@@ -19,6 +20,19 @@ export default function OwnerLoginPage() {
     };
 
     checkSession();
+
+    // Listen for login event
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session) {
+          router.push("/owner/dashboard");
+        }
+      }
+    );
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
   }, [router]);
 
   const handleLogin = async () => {
@@ -28,7 +42,7 @@ export default function OwnerLoginPage() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/owner/dashboard`,
+        emailRedirectTo: `${window.location.origin}/owner/login`,
       },
     });
 
