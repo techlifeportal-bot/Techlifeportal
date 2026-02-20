@@ -13,7 +13,7 @@ export default function OwnerDashboard() {
   const [phone, setPhone] = useState("");
 
   useEffect(() => {
-    const init = async () => {
+    const initialize = async () => {
       const { data: sessionData } = await supabase.auth.getSession();
 
       if (!sessionData.session) {
@@ -23,34 +23,55 @@ export default function OwnerDashboard() {
 
       const userId = sessionData.session.user.id;
 
-      const { data: ownerData } = await supabase
+      const { data: ownerData, error } = await supabase
         .from("pg_owners")
         .select("name, phone")
         .eq("id", userId)
         .single();
 
+      if (error) {
+        console.log("Fetch error:", error);
+      }
+
       if (ownerData?.name && ownerData?.phone) {
+        setName(ownerData.name);
+        setPhone(ownerData.phone);
         setProfileComplete(true);
       }
 
       setLoading(false);
     };
 
-    init();
+    initialize();
   }, [router]);
 
   const handleSave = async () => {
     const { data: sessionData } = await supabase.auth.getSession();
     const userId = sessionData.session?.user.id;
 
-    if (!userId) return;
+    if (!userId) {
+      console.log("No user ID found");
+      return;
+    }
 
-    await supabase
+    const { data, error } = await supabase
       .from("pg_owners")
-      .update({ name, phone })
-      .eq("id", userId);
+      .upsert(
+        {
+          id: userId,
+          name,
+          phone,
+        },
+        { onConflict: "id" }
+      )
+      .select();
 
-    setProfileComplete(true);
+    console.log("Upsert result:", data);
+    console.log("Upsert error:", error);
+
+    if (!error) {
+      setProfileComplete(true);
+    }
   };
 
   if (loading) {
@@ -65,7 +86,7 @@ export default function OwnerDashboard() {
     return (
       <main className="page-container">
         <h1>Complete Your Profile</h1>
-        <p>We need basic details before you continue.</p>
+        <p>We need your basic details before continuing.</p>
 
         <section className="card" style={{ maxWidth: 400 }}>
           <label>Your Name</label>
@@ -98,7 +119,7 @@ export default function OwnerDashboard() {
   return (
     <main className="page-container">
       <h1>Owner Dashboard</h1>
-      <p>Your account is fully set up.</p>
+      <p>Profile saved successfully.</p>
       <p>Listing management coming next.</p>
     </main>
   );
