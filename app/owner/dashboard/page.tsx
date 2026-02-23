@@ -8,6 +8,7 @@ export default function OwnerDashboard() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
+  const [sessionUser, setSessionUser] = useState<any>(null);
   const [planType, setPlanType] = useState("free");
 
   const [pgName, setPgName] = useState("");
@@ -19,19 +20,19 @@ export default function OwnerDashboard() {
 
   useEffect(() => {
     const init = async () => {
-      const { data: userData, error } = await supabase.auth.getUser();
+      const { data } = await supabase.auth.getSession();
 
-      if (error || !userData.user) {
+      if (!data.session) {
         router.push("/owner/login");
         return;
       }
 
-      const user = userData.user;
+      setSessionUser(data.session.user);
 
       const { data: ownerData } = await supabase
         .from("pg_owners")
         .select("plan_type")
-        .eq("id", user.id)
+        .eq("id", data.session.user.id)
         .single();
 
       if (ownerData?.plan_type) {
@@ -45,24 +46,10 @@ export default function OwnerDashboard() {
   }, [router]);
 
   const handleListingSubmit = async () => {
-    const { data: userData, error: userError } =
-      await supabase.auth.getUser();
+    console.log("SESSION USER ID:", sessionUser?.id);
 
-    if (userError || !userData.user) {
+    if (!sessionUser) {
       setMessage("Not authenticated.");
-      return;
-    }
-
-    const user = userData.user;
-
-    // Count listings
-    const { count } = await supabase
-      .from("pgs_rentals")
-      .select("*", { count: "exact", head: true })
-      .eq("owner_id", user.id);
-
-    if (planType === "free" && count && count >= 1) {
-      setMessage("🚫 Free plan allows only 1 listing. Upgrade to Premium.");
       return;
     }
 
@@ -75,7 +62,7 @@ export default function OwnerDashboard() {
         status: "pending",
         source: "owner",
         type: "pg",
-        owner_id: user.id,
+        owner_id: sessionUser.id,
       },
     ]);
 
