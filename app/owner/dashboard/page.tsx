@@ -10,9 +10,7 @@ export default function OwnerDashboard() {
   const [loading, setLoading] = useState(true);
   const [sessionUser, setSessionUser] = useState<any>(null);
 
-  const [profileComplete, setProfileComplete] = useState(false);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [planType, setPlanType] = useState("free");
 
   const [pgName, setPgName] = useState("");
   const [hub, setHub] = useState("");
@@ -34,14 +32,12 @@ export default function OwnerDashboard() {
 
       const { data: ownerData } = await supabase
         .from("pg_owners")
-        .select("name, phone")
+        .select("plan_type")
         .eq("id", data.session.user.id)
         .single();
 
-      if (ownerData?.name && ownerData?.phone) {
-        setName(ownerData.name);
-        setPhone(ownerData.phone);
-        setProfileComplete(true);
+      if (ownerData?.plan_type) {
+        setPlanType(ownerData.plan_type);
       }
 
       setLoading(false);
@@ -50,37 +46,22 @@ export default function OwnerDashboard() {
     init();
   }, [router]);
 
-  const handleProfileSave = async () => {
-    if (!sessionUser) {
-      setMessage("No active session.");
-      return;
-    }
-
-    const { error } = await supabase.from("pg_owners").upsert(
-      {
-        id: sessionUser.id,
-        name,
-        phone,
-      },
-      { onConflict: "id" }
-    );
-
-    if (error) {
-      setMessage(error.message);
-      return;
-    }
-
-    setProfileComplete(true);
-    setMessage("Profile saved.");
-  };
-
   const handleListingSubmit = async () => {
     if (!sessionUser) {
-      setMessage("No authenticated user.");
+      setMessage("Not authenticated.");
       return;
     }
 
-    console.log("AUTH USER:", sessionUser.id);
+    // 🔥 Count existing listings
+    const { count } = await supabase
+      .from("pgs_rentals")
+      .select("*", { count: "exact", head: true })
+      .eq("owner_id", sessionUser.id);
+
+    if (planType === "free" && count && count >= 1) {
+      setMessage("🚫 Free plan allows only 1 listing. Upgrade to Premium.");
+      return;
+    }
 
     const { error } = await supabase.from("pgs_rentals").insert([
       {
@@ -96,12 +77,11 @@ export default function OwnerDashboard() {
     ]);
 
     if (error) {
-      console.log("INSERT ERROR:", error);
       setMessage(error.message);
       return;
     }
 
-    setMessage("Listing submitted.");
+    setMessage("✅ Listing submitted.");
     setPgName("");
     setHub("");
     setLocation("");
@@ -116,36 +96,10 @@ export default function OwnerDashboard() {
     );
   }
 
-  if (!profileComplete) {
-    return (
-      <main className="page-container">
-        <h1>Complete Profile</h1>
-
-        <section className="card" style={{ maxWidth: 400 }}>
-          <label>Name</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} />
-
-          <label>Phone</label>
-          <input value={phone} onChange={(e) => setPhone(e.target.value)} />
-
-          <button
-            onClick={handleProfileSave}
-            disabled={!name || !phone}
-            className="approve-btn"
-            style={{ marginTop: 16 }}
-          >
-            Save Profile
-          </button>
-
-          {message && <p style={{ marginTop: 12 }}>{message}</p>}
-        </section>
-      </main>
-    );
-  }
-
   return (
     <main className="page-container">
       <h1>Owner Dashboard</h1>
+      <p>Plan: {planType.toUpperCase()}</p>
 
       <section className="card" style={{ maxWidth: 500 }}>
         <h3>Add PG Listing</h3>
