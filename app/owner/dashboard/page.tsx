@@ -18,11 +18,12 @@ export default function OwnerDashboard() {
 
   const [message, setMessage] = useState("");
 
+  // ✅ Check session on load
   useEffect(() => {
     const init = async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data, error } = await supabase.auth.getSession();
 
-      if (!data.session) {
+      if (error || !data.session) {
         router.push("/owner/login");
         return;
       }
@@ -45,9 +46,8 @@ export default function OwnerDashboard() {
     init();
   }, [router]);
 
+  // ✅ Submit Listing
   const handleListingSubmit = async () => {
-    console.log("SESSION USER ID:", sessionUser?.id);
-
     if (!sessionUser) {
       setMessage("Not authenticated.");
       return;
@@ -78,6 +78,12 @@ export default function OwnerDashboard() {
     setMapsUrl("");
   };
 
+  // ✅ Logout
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/owner/login");
+  };
+
   if (loading) {
     return (
       <main className="page-container">
@@ -89,7 +95,25 @@ export default function OwnerDashboard() {
   return (
     <main className="page-container">
       <h1>Owner Dashboard</h1>
-      <p>Plan: {planType.toUpperCase()}</p>
+
+      <p>
+        Plan: <strong>{planType.toUpperCase()}</strong>
+      </p>
+
+      <button
+        onClick={handleLogout}
+        style={{
+          marginBottom: 20,
+          padding: "8px 16px",
+          background: "#111",
+          color: "#fff",
+          borderRadius: 6,
+          border: "1px solid #333",
+          cursor: "pointer",
+        }}
+      >
+        Logout
+      </button>
 
       <section className="card" style={{ maxWidth: 500 }}>
         <h3>Add PG Listing</h3>
