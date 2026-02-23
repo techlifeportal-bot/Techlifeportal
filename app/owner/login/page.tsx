@@ -42,7 +42,7 @@ export default function OwnerLoginPage() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/owner/login`,
+        emailRedirectTo: "https://techlifeportal.com/owner/dashboard",
       },
     });
 
