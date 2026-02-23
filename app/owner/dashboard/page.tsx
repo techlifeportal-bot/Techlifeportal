@@ -8,8 +8,9 @@ export default function OwnerDashboard() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
-  const [profileComplete, setProfileComplete] = useState(false);
+  const [sessionUser, setSessionUser] = useState<any>(null);
 
+  const [profileComplete, setProfileComplete] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
 
@@ -21,20 +22,20 @@ export default function OwnerDashboard() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const initialize = async () => {
-      const { data: sessionData } = await supabase.auth.getSession();
+    const init = async () => {
+      const { data } = await supabase.auth.getSession();
 
-      if (!sessionData.session) {
+      if (!data.session) {
         router.push("/owner/login");
         return;
       }
 
-      const userId = sessionData.session.user.id;
+      setSessionUser(data.session.user);
 
       const { data: ownerData } = await supabase
         .from("pg_owners")
         .select("name, phone")
-        .eq("id", userId)
+        .eq("id", data.session.user.id)
         .single();
 
       if (ownerData?.name && ownerData?.phone) {
@@ -46,60 +47,61 @@ export default function OwnerDashboard() {
       setLoading(false);
     };
 
-    initialize();
+    init();
   }, [router]);
 
   const handleProfileSave = async () => {
-    const { data: sessionData } = await supabase.auth.getSession();
-    const userId = sessionData.session?.user.id;
+    if (!sessionUser) {
+      setMessage("No active session.");
+      return;
+    }
 
-    if (!userId) return;
-
-    await supabase.from("pg_owners").upsert(
+    const { error } = await supabase.from("pg_owners").upsert(
       {
-        id: userId,
+        id: sessionUser.id,
         name,
         phone,
       },
       { onConflict: "id" }
     );
 
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+
     setProfileComplete(true);
-    setMessage("✅ Profile saved.");
+    setMessage("Profile saved.");
   };
 
   const handleListingSubmit = async () => {
-    const { data: sessionData } = await supabase.auth.getSession();
-    const userId = sessionData.session?.user.id;
+    if (!sessionUser) {
+      setMessage("No authenticated user.");
+      return;
+    }
 
-    if (!userId) return;
+    console.log("AUTH USER:", sessionUser.id);
 
     const { error } = await supabase.from("pgs_rentals").insert([
       {
         name: pgName,
-        hub: hub,
-        location: location,
+        hub,
+        location,
         maps_url: mapsUrl || null,
         status: "pending",
         source: "owner",
         type: "pg",
-        owner_id: userId,
-        description: null,
-        tag: null,
-        ai_summary: null,
-        priority: null,
-        notes: null,
-        last_verified_at: null,
+        owner_id: sessionUser.id,
       },
     ]);
 
     if (error) {
-      setMessage(`❌ ${error.message}`);
+      console.log("INSERT ERROR:", error);
+      setMessage(error.message);
       return;
     }
 
-    setMessage("✅ Listing submitted. Awaiting approval.");
-
+    setMessage("Listing submitted.");
     setPgName("");
     setHub("");
     setLocation("");
@@ -117,13 +119,13 @@ export default function OwnerDashboard() {
   if (!profileComplete) {
     return (
       <main className="page-container">
-        <h1>Complete Your Profile</h1>
+        <h1>Complete Profile</h1>
 
         <section className="card" style={{ maxWidth: 400 }}>
-          <label>Your Name</label>
+          <label>Name</label>
           <input value={name} onChange={(e) => setName(e.target.value)} />
 
-          <label>Phone Number</label>
+          <label>Phone</label>
           <input value={phone} onChange={(e) => setPhone(e.target.value)} />
 
           <button
@@ -146,18 +148,18 @@ export default function OwnerDashboard() {
       <h1>Owner Dashboard</h1>
 
       <section className="card" style={{ maxWidth: 500 }}>
-        <h3>Add New PG Listing</h3>
+        <h3>Add PG Listing</h3>
 
-        <label>PG Name</label>
+        <label>Name</label>
         <input value={pgName} onChange={(e) => setPgName(e.target.value)} />
 
-        <label>IT Hub</label>
+        <label>Hub</label>
         <input value={hub} onChange={(e) => setHub(e.target.value)} />
 
         <label>Location</label>
         <input value={location} onChange={(e) => setLocation(e.target.value)} />
 
-        <label>Google Maps URL</label>
+        <label>Maps URL</label>
         <input value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} />
 
         <button
