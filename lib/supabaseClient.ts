@@ -1,20 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 
-/**
- * Public Supabase client
- * Safe to use in Server Components
- * Uses ANON key only (NOT service role)
- */
-
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(
   supabaseUrl,
-  supabaseAnonKey,
-  {
-    auth: {
-      persistSession: false,
-    },
-  }
+  supabaseAnonKey
 );
