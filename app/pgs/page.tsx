@@ -15,11 +15,9 @@ type Stay = {
   type: string;
 };
 
-const normalizeHub = (hub: string) => hub.trim().toLowerCase();
-
 export default function PGsPage() {
   const [stays, setStays] = useState<Stay[]>([]);
-  const [selectedHub, setSelectedHub] = useState("electronic city");
+  const [selectedHub, setSelectedHub] = useState("Electronic City");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,7 +42,7 @@ export default function PGsPage() {
         .order("priority", { ascending: false });
 
       if (error) {
-        console.error("Error fetching PGs:", error.message);
+        console.error(error.message);
       }
 
       setStays(data || []);
@@ -55,23 +53,21 @@ export default function PGsPage() {
   }, []);
 
   const hubs = [
-    "electronic city",
-    "Manyata tech park",
-    "whitefield",
-    "HSR layout",
+    "Electronic City",
+    "Manyata Tech Park",
+    "Whitefield",
+    "HSR Layout",
   ];
 
-  const filteredStays = stays.filter((stay) => {
-    if (!stay.hub) return false;
-    return normalizeHub(stay.hub) === selectedHub;
-  });
+  const filteredStays = stays.filter(
+    (stay) => stay.hub === selectedHub
+  );
 
   const handleHubChange = (hub: string) => {
-    if (hub !== "electronic city") {
+    if (hub !== "Electronic City") {
       alert(`${hub} launching soon.`);
       return;
     }
-
     setSelectedHub(hub);
   };
 
@@ -102,7 +98,7 @@ export default function PGsPage() {
 
       {!loading && filteredStays.length === 0 && (
         <p className="empty-state">
-          No verified PGs found in Electronic City.
+          No verified PGs found in {selectedHub}.
         </p>
       )}
 
@@ -121,7 +117,9 @@ export default function PGsPage() {
               )}
 
               {stay.location && (
-                <p className="pg-location">🏠 {stay.location}</p>
+                <p className="pg-location">
+                  🏠 {stay.location}
+                </p>
               )}
 
               {stay.description && (
