@@ -13,9 +13,8 @@ type Stay = {
   maps_url: string | null;
   hub: string | null;
   location: string | null;
-
-  status: string; // active / pending
-  type: string;   // pg / rental
+  status: string;
+  type: string;
 };
 
 /* ---------------- HELPERS ---------------- */
@@ -26,7 +25,7 @@ const normalizeHub = (hub: string) => hub.trim().toLowerCase();
 
 export default function PGsPage() {
   const [stays, setStays] = useState<Stay[]>([]);
-  const [selectedHub, setSelectedHub] = useState("all");
+  const [selectedHub, setSelectedHub] = useState("Electronic City");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -38,8 +37,7 @@ export default function PGsPage() {
 
       const { data, error } = await supabase
         .from("pgs_rentals")
-        .select(
-          `
+        .select(`
           id,
           name,
           description,
@@ -49,10 +47,9 @@ export default function PGsPage() {
           location,
           status,
           type
-        `
-        )
-        .eq("type", "pg")         // ONLY PGs
-        .eq("status", "active")   // ONLY VERIFIED
+        `)
+        .eq("type", "pg")
+        .eq("status", "active")
         .order("priority", { ascending: false });
 
       if (error) {
@@ -66,23 +63,25 @@ export default function PGsPage() {
     fetchStays();
   }, []);
 
-  /* ---------------- HUB DROPDOWN LIST ---------------- */
+  /* ---------------- FIXED HUB LIST ---------------- */
 
-  const hubs = Array.from(
-    new Set(
-      stays
-        .map((s) => s.hub)
-        .filter(Boolean)
-        .map((h) => h!.trim())
-    )
-  );
+  const hubs = [
+    "Electronic City",
+    "Manyata Tech Park",
+    "Whitefield",
+    "HSR Layout",
+  ];
 
   /* ---------------- FILTER BY HUB ---------------- */
 
   const filteredStays = stays.filter((stay) => {
     if (!stay.hub) return false;
-    if (selectedHub === "all") return true;
-    return normalizeHub(stay.hub) === normalizeHub(selectedHub);
+
+    if (selectedHub === "Electronic City") {
+      return normalizeHub(stay.hub) === normalizeHub("Electronic City");
+    }
+
+    return false;
   });
 
   /* ---------------- UI ---------------- */
@@ -104,31 +103,32 @@ export default function PGsPage() {
             className="dropdown-trigger"
             onClick={() => setOpen(!open)}
           >
-            {selectedHub === "all" ? "All hubs" : selectedHub}
+            {selectedHub}
             <span className="arrow">▾</span>
           </button>
 
           {open && (
             <div className="dropdown-menu">
-              {/* ALL */}
-              <div
-                className="dropdown-item"
-                onClick={() => {
-                  setSelectedHub("all");
-                  setOpen(false);
-                }}
-              >
-                All hubs
-              </div>
-
-              {/* HUBS */}
               {hubs.map((hub) => (
                 <div
                   key={hub}
                   className="dropdown-item"
                   onClick={() => {
+                    if (hub !== "Electronic City") {
+                      alert(`${hub} launching soon.`);
+                      setOpen(false);
+                      return;
+                    }
+
                     setSelectedHub(hub);
                     setOpen(false);
+                  }}
+                  style={{
+                    opacity: hub === "Electronic City" ? 1 : 0.6,
+                    cursor:
+                      hub === "Electronic City"
+                        ? "pointer"
+                        : "not-allowed",
                   }}
                 >
                   {hub}
@@ -146,7 +146,9 @@ export default function PGsPage() {
 
       {/* EMPTY */}
       {!loading && filteredStays.length === 0 && (
-        <p className="empty-state">No verified PGs found.</p>
+        <p className="empty-state">
+          No verified PGs found in Electronic City.
+        </p>
       )}
 
       {/* PG LIST */}
@@ -154,32 +156,26 @@ export default function PGsPage() {
         <section className="card-grid">
           {filteredStays.map((stay) => (
             <div key={stay.id} className="card pg-card">
-              {/* TAG */}
               {stay.tag && (
                 <span className="pg-tag">{stay.tag}</span>
               )}
 
-              {/* TITLE */}
               <h3 className="pg-title">{stay.name}</h3>
 
-              {/* HUB */}
               {stay.hub && (
                 <p className="pg-hub">📍 {stay.hub}</p>
               )}
 
-              {/* LOCATION */}
               {stay.location && (
                 <p className="pg-location">
                   🏠 {stay.location}
                 </p>
               )}
 
-              {/* DESCRIPTION */}
               {stay.description && (
                 <p className="pg-desc">{stay.description}</p>
               )}
 
-              {/* MAP */}
               {stay.maps_url && (
                 <a
                   href={stay.maps_url}
@@ -191,7 +187,6 @@ export default function PGsPage() {
                 </a>
               )}
 
-              {/* PREMIUM PLACEHOLDER */}
               <div className="premium-box">
                 ⭐ Premium Owners will get more enquiries here
               </div>
