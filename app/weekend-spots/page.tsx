@@ -3,160 +3,143 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-/* ---------------- TYPES ---------------- */
-
-type Stay = {
-  id: string;
-  name: string;
-  description: string | null;
+type WeekendSpot = {
+  id: number;
   tag: string | null;
-  maps_url: string | null;
-  hub: string | null;
+  category: string | null;
   location: string | null;
-  status: string;
-  type: string;
+  travel_time: string | null;
+  maps_url: string | null;
+  image_url: string | null;
 };
 
-/* ---------------- HELPERS ---------------- */
-
-const normalizeHub = (hub: string) => hub.trim().toLowerCase();
-
-/* ---------------- PAGE ---------------- */
-
-export default function PGsPage() {
-  const [stays, setStays] = useState<Stay[]>([]);
-  const [selectedHub, setSelectedHub] = useState("Electronic City");
+export default function WeekendSpotsPage() {
+  const [spots, setSpots] = useState<WeekendSpot[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [loading, setLoading] = useState(true);
 
-  /* ---------------- FETCH PG LISTINGS ---------------- */
-
   useEffect(() => {
-    const fetchStays = async () => {
+    const fetchSpots = async () => {
       setLoading(true);
 
-      const { data, error } = await supabase
-        .from("pgs_rentals")
-        .select(`
-          id,
-          name,
-          description,
-          tag,
-          maps_url,
-          hub,
-          location,
-          status,
-          type
-        `)
-        .eq("type", "pg")
-        .eq("status", "active")
-        .order("priority", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching PGs:", error.message);
+      // Try cache first
+      const cached = localStorage.getItem("weekend_spots_cache");
+      if (cached) {
+        setSpots(JSON.parse(cached));
+        setLoading(false);
+        return;
       }
 
-      setStays(data || []);
+      // Fetch from Supabase
+      const { data, error } = await supabase
+        .from("weekend_spots")
+        .select(
+          "id, tag, category, location, travel_time, maps_url, image_url"
+        )
+        .order("id", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching weekend spots:", error);
+      } else {
+        setSpots(data || []);
+        localStorage.setItem("weekend_spots_cache", JSON.stringify(data || []));
+      }
+
       setLoading(false);
     };
 
-    fetchStays();
+    fetchSpots();
   }, []);
 
-  /* ---------------- HUB LIST ---------------- */
-
-  const hubs = [
-    "Electronic City",
-    "Manyata Tech Park",
-    "Whitefield",
-    "HSR Layout",
-  ];
-
-  /* ---------------- FILTER ---------------- */
-
-  const filteredStays = stays.filter((stay) => {
-    if (!stay.hub) return false;
-
-    return normalizeHub(stay.hub) === normalizeHub("Electronic City");
-  });
-
-  /* ---------------- HANDLE HUB CHANGE ---------------- */
-
-  const handleHubChange = (hub: string) => {
-    if (hub !== "Electronic City") {
-      alert(`${hub} launching soon.`);
-      return;
-    }
-
-    setSelectedHub(hub);
-  };
-
-  /* ---------------- UI ---------------- */
+  const filteredSpots =
+    selectedCategory === "all"
+      ? spots
+      : spots.filter((spot) => {
+          if (!spot.category) return false;
+          return spot.category
+            .toLowerCase()
+            .split(",")
+            .map((c) => c.trim())
+            .includes(selectedCategory);
+        });
 
   return (
     <main className="page-container">
       {/* HEADER */}
       <header className="page-header">
-        <h1>Verified PGs Near IT Hubs</h1>
+        <h1>Explore Weekend Spots</h1>
+
         <p>
-          Only trusted PG listings. Direct enquiry. No brokers.
+          Explore famous temples, nature spots, and short weekend getaways in and
+          around Bangalore.
         </p>
 
-        {/* SELECT BAR (Same Style as Weekend Spots) */}
+        {/* CATEGORY SELECT */}
         <div className="filter-box">
-          <label>Select IT Hub</label>
+          <label>Select category</label>
           <select
-            value={selectedHub}
-            onChange={(e) => handleHubChange(e.target.value)}
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
           >
-            {hubs.map((hub) => (
-              <option key={hub} value={hub}>
-                {hub}
-              </option>
-            ))}
+            <option value="all">All</option>
+            <option value="temple">Temples</option>
+            <option value="trekking">Trekking</option>
+            <option value="nature">Nature</option>
+            <option value="waterfalls">Waterfalls</option>
+            <option value="heritage">Heritage</option>
+            <option value="resorts">Resorts</option>
           </select>
         </div>
       </header>
 
-      {/* LOADING */}
+      {/* SKELETON LOADER */}
       {loading && (
-        <p className="empty-state">Loading verified PGs…</p>
-      )}
-
-      {/* EMPTY */}
-      {!loading && filteredStays.length === 0 && (
-        <p className="empty-state">
-          No verified PGs found in Electronic City.
-        </p>
-      )}
-
-      {/* PG LIST */}
-      {!loading && filteredStays.length > 0 && (
         <section className="card-grid">
-          {filteredStays.map((stay) => (
-            <div key={stay.id} className="card pg-card">
-              {stay.tag && (
-                <span className="pg-tag">{stay.tag}</span>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="skeleton" />
+          ))}
+        </section>
+      )}
+
+      {/* EMPTY STATE */}
+      {!loading && filteredSpots.length === 0 && (
+        <p>No weekend spots found.</p>
+      )}
+
+      {/* CARDS */}
+      {!loading && filteredSpots.length > 0 && (
+        <section className="card-grid">
+          {filteredSpots.map((spot) => (
+            <div key={spot.id} className="card">
+              {/* IMAGE */}
+              {spot.image_url && (
+                <img
+                  src={spot.image_url}
+                  alt={spot.tag || "Weekend spot"}
+                  className="spot-image"
+                  loading="lazy"
+                />
               )}
 
-              <h3 className="pg-title">{stay.name}</h3>
+              {/* TITLE */}
+              <h3>{spot.tag || "Unnamed Spot"}</h3>
 
-              {stay.hub && (
-                <p className="pg-hub">📍 {stay.hub}</p>
+              {/* LOCATION */}
+              {spot.location && (
+                <p className="location">📍 {spot.location}</p>
               )}
 
-              {stay.location && (
-                <p className="pg-location">
-                  🏠 {stay.location}
+              {/* TRAVEL TIME */}
+              {spot.travel_time && (
+                <p className="travel-time">
+                  ⏱️ ~{spot.travel_time} from Bangalore
                 </p>
               )}
 
-              {stay.description && (
-                <p className="pg-desc">{stay.description}</p>
-              )}
-
-              {stay.maps_url && (
+              {/* MAP LINK */}
+              {spot.maps_url && (
                 <a
-                  href={stay.maps_url}
+                  href={spot.maps_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="map-link"
@@ -164,10 +147,6 @@ export default function PGsPage() {
                   View on Google Maps →
                 </a>
               )}
-
-              <div className="premium-box">
-                ⭐ Premium Owners will get more enquiries here
-              </div>
             </div>
           ))}
         </section>
