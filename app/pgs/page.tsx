@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-/* ---------------- TYPES ---------------- */
-
 type Stay = {
   id: string;
   name: string;
@@ -17,19 +15,12 @@ type Stay = {
   type: string;
 };
 
-/* ---------------- HELPERS ---------------- */
-
 const normalizeHub = (hub: string) => hub.trim().toLowerCase();
-
-/* ---------------- PAGE ---------------- */
 
 export default function PGsPage() {
   const [stays, setStays] = useState<Stay[]>([]);
-  const [selectedHub, setSelectedHub] = useState("Electronic City");
-  const [open, setOpen] = useState(false);
+  const [selectedHub, setSelectedHub] = useState("electronic city");
   const [loading, setLoading] = useState(true);
-
-  /* ---------------- FETCH PG LISTINGS ---------------- */
 
   useEffect(() => {
     const fetchStays = async () => {
@@ -63,95 +54,58 @@ export default function PGsPage() {
     fetchStays();
   }, []);
 
-  /* ---------------- FIXED HUB LIST ---------------- */
-
   const hubs = [
-    "Electronic City",
-    "Manyata Tech Park",
-    "Whitefield",
-    "HSR Layout",
+    "electronic city",
+    "Manyata tech park",
+    "whitefield",
+    "HSR layout",
   ];
-
-  /* ---------------- FILTER BY HUB ---------------- */
 
   const filteredStays = stays.filter((stay) => {
     if (!stay.hub) return false;
-
-    if (selectedHub === "Electronic City") {
-      return normalizeHub(stay.hub) === normalizeHub("Electronic City");
-    }
-
-    return false;
+    return normalizeHub(stay.hub) === selectedHub;
   });
 
-  /* ---------------- UI ---------------- */
+  const handleHubChange = (hub: string) => {
+    if (hub !== "electronic city") {
+      alert(`${hub} launching soon.`);
+      return;
+    }
+
+    setSelectedHub(hub);
+  };
 
   return (
     <main className="page-container">
-      {/* HEADER */}
       <header className="page-header">
         <h1>Verified PGs Near IT Hubs</h1>
-        <p>
-          Only trusted PG listings. Direct enquiry. No brokers.
-        </p>
+        <p>Only trusted PG listings. Direct enquiry. No brokers.</p>
 
-        {/* HUB DROPDOWN */}
-        <div className="dropdown">
+        <div className="filter-box">
           <label>Select IT Hub</label>
-
-          <button
-            className="dropdown-trigger"
-            onClick={() => setOpen(!open)}
+          <select
+            value={selectedHub}
+            onChange={(e) => handleHubChange(e.target.value)}
           >
-            {selectedHub}
-            <span className="arrow">▾</span>
-          </button>
-
-          {open && (
-            <div className="dropdown-menu">
-              {hubs.map((hub) => (
-                <div
-                  key={hub}
-                  className="dropdown-item"
-                  onClick={() => {
-                    if (hub !== "Electronic City") {
-                      alert(`${hub} launching soon.`);
-                      setOpen(false);
-                      return;
-                    }
-
-                    setSelectedHub(hub);
-                    setOpen(false);
-                  }}
-                  style={{
-                    opacity: hub === "Electronic City" ? 1 : 0.6,
-                    cursor:
-                      hub === "Electronic City"
-                        ? "pointer"
-                        : "not-allowed",
-                  }}
-                >
-                  {hub}
-                </div>
-              ))}
-            </div>
-          )}
+            {hubs.map((hub) => (
+              <option key={hub} value={hub}>
+                {hub}
+              </option>
+            ))}
+          </select>
         </div>
       </header>
 
-      {/* LOADING */}
       {loading && (
         <p className="empty-state">Loading verified PGs…</p>
       )}
 
-      {/* EMPTY */}
       {!loading && filteredStays.length === 0 && (
         <p className="empty-state">
           No verified PGs found in Electronic City.
         </p>
       )}
 
-      {/* PG LIST */}
       {!loading && filteredStays.length > 0 && (
         <section className="card-grid">
           {filteredStays.map((stay) => (
@@ -167,9 +121,7 @@ export default function PGsPage() {
               )}
 
               {stay.location && (
-                <p className="pg-location">
-                  🏠 {stay.location}
-                </p>
+                <p className="pg-location">🏠 {stay.location}</p>
               )}
 
               {stay.description && (
