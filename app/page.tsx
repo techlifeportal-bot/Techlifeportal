@@ -12,6 +12,30 @@ const inter = Inter({
 export default function HomePage() {
   return (
     <main className={inter.className}>
+      {/* TOP BAR */}
+      <header
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          padding: "20px 40px",
+        }}
+      >
+        <Link
+          href="/owner/login"
+          style={{
+            padding: "8px 18px",
+            backgroundColor: "#111",
+            color: "#fff",
+            borderRadius: 8,
+            fontWeight: 500,
+            textDecoration: "none",
+            fontSize: 14,
+          }}
+        >
+          List Your PG
+        </Link>
+      </header>
+
       {/* HERO SECTION */}
       <section className="hero">
         <h1>TechLifePortal</h1>
@@ -25,22 +49,6 @@ export default function HomePage() {
           Discover PGs, rentals, and weekend spots around Bangalore —
           all curated with IT life in mind.
         </p>
-
-        <div style={{ marginTop: 30 }}>
-          <Link
-            href="/owner/login"
-            style={{
-              display: "inline-block",
-              padding: "10px 20px",
-              border: "1px solid #333",
-              borderRadius: 8,
-              fontWeight: 500,
-              textDecoration: "none",
-            }}
-          >
-            List Your PG – Free →
-          </Link>
-        </div>
       </section>
 
       {/* FEATURES */}
@@ -123,7 +131,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FEEDBACK BOX */}
       <FeedbackBox />
 
       {/* MINIMAL ABOUT */}
@@ -133,7 +140,6 @@ export default function HomePage() {
         </p>
       </section>
 
-      {/* FOOTER */}
       <footer>
         © 2026 TechLifePortal. All rights reserved.
       </footer>
