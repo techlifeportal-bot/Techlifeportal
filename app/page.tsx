@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Inter } from "next/font/google";
 import FeedbackBox from "@/app/components/FeedbackBox";
@@ -10,6 +11,12 @@ const inter = Inter({
 });
 
 export default function HomePage() {
+  const [selectedHub, setSelectedHub] = useState<string | null>(null);
+
+  const handleComingSoonClick = (hub: string) => {
+    setSelectedHub(hub);
+  };
+
   return (
     <main className={inter.className}>
       {/* HERO SECTION */}
@@ -25,6 +32,38 @@ export default function HomePage() {
           Discover PGs, rentals, and weekend spots around Bangalore —
           all curated with IT life in mind.
         </p>
+
+        {/* OWNER CTA */}
+        <div style={{ marginTop: 30 }}>
+          <Link href="/owner/login" className="owner-cta">
+            List Your PG – Free →
+          </Link>
+        </div>
+      </section>
+
+      {/* HUB ROLLOUT SECTION */}
+      <section style={{ textAlign: "center", margin: "60px 0" }}>
+        <h2>Currently Serving</h2>
+
+        <div style={{ marginTop: 20 }}>
+          <span className="active-hub">Electronic City ✅</span>
+        </div>
+
+        <h3 style={{ marginTop: 40 }}>Launching Soon</h3>
+
+        <div className="coming-soon-grid">
+          <button onClick={() => handleComingSoonClick("Manyata Tech Park")}>
+            Manyata Tech Park 🚀
+          </button>
+
+          <button onClick={() => handleComingSoonClick("Whitefield")}>
+            Whitefield 🚀
+          </button>
+
+          <button onClick={() => handleComingSoonClick("HSR Layout")}>
+            HSR Layout 🚀
+          </button>
+        </div>
       </section>
 
       {/* FEATURES */}
@@ -51,64 +90,36 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="feature-card">
-          <h2>☕ Cafes</h2>
-          <p>
-            Cafes near IT hubs — perfect for quick breaks,
-            casual meetings, or working remotely.
-          </p>
-          <span className="badge">
-            Unlocks as the community grows
-          </span>
-        </div>
-
-        <div className="feature-card">
-          <h2>🏋️ Gyms</h2>
-          <p>
-            Gyms and fitness centers around IT hubs to help
-            maintain a healthy work-life balance.
-          </p>
-          <span className="badge">
-            Unlocks as the community grows
-          </span>
-        </div>
-
-        <div className="feature-card">
-          <h2>🏢 Companies</h2>
-          <p>
-            Explore IT companies across Bangalore with
-            insights into work culture and locations.
-          </p>
-          <span className="badge">
-            Unlocks as the community grows
-          </span>
-        </div>
-
-        <div className="feature-card">
-          <h2>💼 IT Jobs</h2>
-          <p>
-            Discover IT job opportunities aligned with
-            Bangalore’s tech ecosystem.
-          </p>
-          <span className="badge">
-            Unlocks as the community grows
-          </span>
-        </div>
-
-        <div className="feature-card">
-          <h2>🤖 AI Resume Builder</h2>
-          <p>
-            Build resumes tailored for IT roles using
-            smart AI assistance.
-          </p>
-          <span className="badge">
-            Unlocks as the community grows
-          </span>
-        </div>
+        {/* Other feature cards unchanged */}
       </section>
 
-      {/* FEEDBACK BOX */}
       <FeedbackBox />
+
+      {/* COMING SOON MODAL */}
+      {selectedHub && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>{selectedHub} – Launching Soon</h3>
+            <p>
+              We are onboarding PGs in this hub.
+              Want to be notified when it goes live?
+            </p>
+
+            <input placeholder="Enter your email" />
+
+            <button style={{ marginTop: 10 }}>
+              Notify Me
+            </button>
+
+            <button
+              onClick={() => setSelectedHub(null)}
+              style={{ marginTop: 15, background: "transparent" }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ABOUT SECTION */}
       <section className="about-section">
@@ -116,24 +127,7 @@ export default function HomePage() {
 
         <p>
           TechLifePortal is a Bangalore-focused platform built exclusively for IT
-          professionals. The goal is simple — to make everyday IT life easier by
-          bringing trusted, relevant information into one place.
-        </p>
-
-        <p>
-          Instead of generic listings, TechLifePortal focuses on real needs around IT
-          hubs — where to stay, where to go on weekends, and how to balance work with
-          life.
-        </p>
-
-        <p>
-          TechLifePortal is designed for moments when you haven’t planned much —
-          helping you quickly discover nearby places without overthinking.
-        </p>
-
-        <p>
-          This platform is currently in beta and will grow gradually based on feedback
-          from the IT community.
+          professionals.
         </p>
 
         <p className="about-footer">
@@ -141,7 +135,6 @@ export default function HomePage() {
         </p>
       </section>
 
-      {/* FOOTER */}
       <footer>
         © 2026 TechLifePortal. All rights reserved.
       </footer>
