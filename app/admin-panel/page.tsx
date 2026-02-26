@@ -13,8 +13,9 @@ type Enquiry = {
   phone: string;
   move_in: string;
   message: string | null;
-  status: string;
+  status: "pending" | "approved" | "rejected";
   created_at: string;
+  owner_id: string;
 };
 
 type OwnerRequest = {
@@ -58,13 +59,13 @@ export default function AdminPanel() {
     checkAdmin();
   }, []);
 
-  /* ---------------- FETCH BOTH ---------------- */
+  /* ---------------- FETCH DATA ---------------- */
 
   const fetchData = async () => {
     setLoading(true);
 
     const { data: enqData } = await supabase
-      .from("pg_enquiries_demo")
+      .from("pg_enquiries")
       .select("*")
       .order("created_at", { ascending: false });
 
@@ -78,12 +79,21 @@ export default function AdminPanel() {
     setLoading(false);
   };
 
-  /* ---------------- MARK CONTACTED ---------------- */
+  /* ---------------- ENQUIRY ACTIONS ---------------- */
 
-  const markContacted = async (id: string) => {
+  const approveEnquiry = async (id: string) => {
     await supabase
-      .from("pg_enquiries_demo")
-      .update({ status: "contacted" })
+      .from("pg_enquiries")
+      .update({ status: "approved" })
+      .eq("id", id);
+
+    fetchData();
+  };
+
+  const rejectEnquiry = async (id: string) => {
+    await supabase
+      .from("pg_enquiries")
+      .update({ status: "rejected" })
       .eq("id", id);
 
     fetchData();
@@ -92,7 +102,6 @@ export default function AdminPanel() {
   /* ---------------- APPROVE OWNER REQUEST ---------------- */
 
   const approveRequest = async (request: OwnerRequest) => {
-    // Insert into pgs_rentals
     await supabase.from("pgs_rentals").insert([
       {
         name: request.pg_name,
@@ -106,7 +115,6 @@ export default function AdminPanel() {
       },
     ]);
 
-    // Mark request as approved
     await supabase
       .from("pg_owner_requests")
       .update({ status: "approved" })
@@ -172,8 +180,10 @@ export default function AdminPanel() {
             padding: 20,
             borderRadius: 16,
             background:
-              enq.status === "contacted"
+              enq.status === "approved"
                 ? "rgba(34,197,94,0.15)"
+                : enq.status === "rejected"
+                ? "rgba(239,68,68,0.15)"
                 : "rgba(255,255,255,0.08)",
             border: "1px solid rgba(255,255,255,0.15)",
           }}
@@ -183,19 +193,33 @@ export default function AdminPanel() {
           <p>Phone: {enq.phone}</p>
           <p>Status: {enq.status}</p>
 
-          {enq.status !== "contacted" && (
-            <button
-              onClick={() => markContacted(enq.id)}
-              style={{
-                marginTop: 10,
-                padding: "8px 16px",
-                borderRadius: 8,
-                background: "white",
-                color: "black",
-              }}
-            >
-              Mark Contacted
-            </button>
+          {enq.status === "pending" && (
+            <div style={{ marginTop: 10 }}>
+              <button
+                onClick={() => approveEnquiry(enq.id)}
+                style={{
+                  marginRight: 10,
+                  padding: "8px 16px",
+                  borderRadius: 8,
+                  background: "white",
+                  color: "black",
+                }}
+              >
+                Approve
+              </button>
+
+              <button
+                onClick={() => rejectEnquiry(enq.id)}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: 8,
+                  background: "rgba(239,68,68,0.9)",
+                  color: "white",
+                }}
+              >
+                Reject
+              </button>
+            </div>
           )}
         </div>
       ))}
