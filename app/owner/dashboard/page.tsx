@@ -137,6 +137,18 @@ export default function OwnerDashboard() {
     setSubmitting(true);
     setMessage("");
 
+    // 🔍 Check how many listings this owner already has
+    const { data: existingListings } = await supabase
+      .from("pgs_rentals")
+      .select("id")
+      .eq("owner_id", sessionUser.id);
+
+    if (planType === "free" && existingListings && existingListings.length >= 1) {
+      setSubmitting(false);
+      setMessage("Free plan limit exceeded.");
+      return;
+    }
+
     const imageUrls = await uploadImages();
 
     const { error } = await supabase.from("pgs_rentals").insert([
@@ -160,7 +172,7 @@ export default function OwnerDashboard() {
       return;
     }
 
-    setMessage("success");
+    setMessage("Submit successful.");
 
     setPgName("");
     setHub("");
@@ -246,29 +258,15 @@ export default function OwnerDashboard() {
             color: "#000",
             border: "none",
             cursor: submitting ? "not-allowed" : "pointer",
-            transition: "all 0.2s ease",
           }}
         >
-          {submitting ? "Submitting..." : "Submit Listing for Review"}
+          {submitting ? "Submitting..." : "Submit Listing"}
         </button>
 
-        {message === "success" && (
-          <div
-            style={{
-              marginTop: 16,
-              padding: 14,
-              borderRadius: 12,
-              background: "rgba(34,197,94,0.15)",
-              border: "1px solid rgba(34,197,94,0.4)",
-              fontSize: 14,
-            }}
-          >
-            ✅ Listing submitted successfully. Admin will review and publish it soon.
-          </div>
-        )}
-
-        {message && message !== "success" && (
-          <p style={{ marginTop: 12, color: "#f87171" }}>{message}</p>
+        {message && (
+          <p style={{ marginTop: 14, fontWeight: 500 }}>
+            {message}
+          </p>
         )}
       </section>
 
