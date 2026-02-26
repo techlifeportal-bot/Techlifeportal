@@ -18,6 +18,8 @@ export default function OwnerDashboard() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
   const [sessionUser, setSessionUser] = useState<any>(null);
   const [planType, setPlanType] = useState("free");
 
@@ -132,6 +134,9 @@ export default function OwnerDashboard() {
       return;
     }
 
+    setSubmitting(true);
+    setMessage("");
+
     const imageUrls = await uploadImages();
 
     const { error } = await supabase.from("pgs_rentals").insert([
@@ -148,12 +153,14 @@ export default function OwnerDashboard() {
       },
     ]);
 
+    setSubmitting(false);
+
     if (error) {
       setMessage(error.message);
       return;
     }
 
-    setMessage("✅ Listing submitted with images. Waiting for admin approval.");
+    setMessage("success");
 
     setPgName("");
     setHub("");
@@ -210,7 +217,6 @@ export default function OwnerDashboard() {
         <label>Upload Images</label>
         <input type="file" multiple onChange={handleImageChange} />
 
-        {/* Image Preview */}
         <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
           {imagePreviews.map((src, index) => (
             <img
@@ -226,13 +232,44 @@ export default function OwnerDashboard() {
 
         <button
           onClick={handleListingSubmit}
-          disabled={!pgName || !hub || !location}
-          style={{ marginTop: 16 }}
+          disabled={!pgName || !hub || !location || submitting}
+          style={{
+            marginTop: 20,
+            width: "100%",
+            padding: "14px",
+            borderRadius: 12,
+            fontSize: 16,
+            fontWeight: 600,
+            background: submitting
+              ? "rgba(255,255,255,0.2)"
+              : "linear-gradient(90deg,#ffffff,#d4d4d4)",
+            color: "#000",
+            border: "none",
+            cursor: submitting ? "not-allowed" : "pointer",
+            transition: "all 0.2s ease",
+          }}
         >
-          Submit Listing
+          {submitting ? "Submitting..." : "Submit Listing for Review"}
         </button>
 
-        {message && <p style={{ marginTop: 12 }}>{message}</p>}
+        {message === "success" && (
+          <div
+            style={{
+              marginTop: 16,
+              padding: 14,
+              borderRadius: 12,
+              background: "rgba(34,197,94,0.15)",
+              border: "1px solid rgba(34,197,94,0.4)",
+              fontSize: 14,
+            }}
+          >
+            ✅ Listing submitted successfully. Admin will review and publish it soon.
+          </div>
+        )}
+
+        {message && message !== "success" && (
+          <p style={{ marginTop: 12, color: "#f87171" }}>{message}</p>
+        )}
       </section>
 
       {/* ---------------- APPROVED ENQUIRIES ---------------- */}
