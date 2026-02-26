@@ -26,6 +26,9 @@ export default function OwnerDashboard() {
   const [location, setLocation] = useState("");
   const [mapsUrl, setMapsUrl] = useState("");
 
+  const [images, setImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
   const [message, setMessage] = useState("");
   const [approvedEnquiries, setApprovedEnquiries] = useState<Enquiry[]>([]);
 
@@ -73,6 +76,54 @@ export default function OwnerDashboard() {
     setApprovedEnquiries(data || []);
   };
 
+  /* ---------------- HANDLE IMAGE SELECT ---------------- */
+
+  const handleImageChange = (e: any) => {
+    const files = Array.from(e.target.files);
+
+    if (planType === "free" && files.length > 2) {
+      setMessage("Free plan allows maximum 2 images.");
+      return;
+    }
+
+    setImages(files as File[]);
+
+    const previews = files.map((file: any) =>
+      URL.createObjectURL(file)
+    );
+
+    setImagePreviews(previews);
+  };
+
+  /* ---------------- UPLOAD IMAGES ---------------- */
+
+  const uploadImages = async (): Promise<string[]> => {
+    if (!sessionUser) return [];
+
+    const uploadedUrls: string[] = [];
+
+    for (const file of images) {
+      const filePath = `${sessionUser.id}/${Date.now()}-${file.name}`;
+
+      const { error } = await supabase.storage
+        .from("pg-images")
+        .upload(filePath, file);
+
+      if (error) {
+        console.error(error);
+        continue;
+      }
+
+      const { data } = supabase.storage
+        .from("pg-images")
+        .getPublicUrl(filePath);
+
+      uploadedUrls.push(data.publicUrl);
+    }
+
+    return uploadedUrls;
+  };
+
   /* ---------------- SUBMIT LISTING ---------------- */
 
   const handleListingSubmit = async () => {
@@ -80,6 +131,8 @@ export default function OwnerDashboard() {
       setMessage("Not authenticated.");
       return;
     }
+
+    const imageUrls = await uploadImages();
 
     const { error } = await supabase.from("pgs_rentals").insert([
       {
@@ -91,6 +144,7 @@ export default function OwnerDashboard() {
         source: "owner",
         type: "pg",
         owner_id: sessionUser.id,
+        images: imageUrls,
       },
     ]);
 
@@ -99,11 +153,14 @@ export default function OwnerDashboard() {
       return;
     }
 
-    setMessage("✅ Listing submitted. Waiting for admin approval.");
+    setMessage("✅ Listing submitted with images. Waiting for admin approval.");
+
     setPgName("");
     setHub("");
     setLocation("");
     setMapsUrl("");
+    setImages([]);
+    setImagePreviews([]);
   };
 
   /* ---------------- LOGOUT ---------------- */
@@ -129,18 +186,7 @@ export default function OwnerDashboard() {
         Plan: <strong>{planType.toUpperCase()}</strong>
       </p>
 
-      <button
-        onClick={handleLogout}
-        style={{
-          marginBottom: 20,
-          padding: "8px 16px",
-          background: "#111",
-          color: "#fff",
-          borderRadius: 6,
-          border: "1px solid #333",
-          cursor: "pointer",
-        }}
-      >
+      <button onClick={handleLogout} style={{ marginBottom: 20 }}>
         Logout
       </button>
 
@@ -160,6 +206,23 @@ export default function OwnerDashboard() {
 
         <label>Maps URL</label>
         <input value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} />
+
+        <label>Upload Images</label>
+        <input type="file" multiple onChange={handleImageChange} />
+
+        {/* Image Preview */}
+        <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+          {imagePreviews.map((src, index) => (
+            <img
+              key={index}
+              src={src}
+              alt="preview"
+              width={80}
+              height={80}
+              style={{ objectFit: "cover", borderRadius: 8 }}
+            />
+          ))}
+        </div>
 
         <button
           onClick={handleListingSubmit}
