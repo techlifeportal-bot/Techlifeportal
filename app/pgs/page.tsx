@@ -16,6 +16,7 @@ type Stay = {
   owner_id: string | null;
   status: string;
   type: string;
+  images: string[] | null;
 };
 
 export default function PGsPage() {
@@ -41,8 +42,7 @@ export default function PGsPage() {
 
       const { data, error } = await supabase
         .from("pgs_rentals")
-        .select(
-          `
+        .select(`
           id,
           name,
           description,
@@ -52,9 +52,9 @@ export default function PGsPage() {
           location,
           owner_id,
           status,
-          type
-        `
-        )
+          type,
+          images
+        `)
         .eq("type", "pg")
         .eq("status", "active");
 
@@ -155,7 +155,24 @@ export default function PGsPage() {
         <section className="card-grid">
           {filteredStays.map((stay) => (
             <div key={stay.id} className="card">
+
+              {/* -------- IMAGE -------- */}
+              {stay.images && stay.images.length > 0 && (
+                <img
+                  src={stay.images[0]}
+                  alt={stay.name}
+                  style={{
+                    width: "100%",
+                    height: 180,
+                    objectFit: "cover",
+                    borderRadius: 12,
+                    marginBottom: 12,
+                  }}
+                />
+              )}
+
               <h3>{stay.name}</h3>
+
               {stay.location && <p>📍 {stay.location}</p>}
               {stay.description && <p>{stay.description}</p>}
 
@@ -185,7 +202,8 @@ export default function PGsPage() {
         </section>
       )}
 
-      {/* ENQUIRY MODAL */}
+      {/* ---------------- ENQUIRY MODAL ---------------- */}
+
       {showForm && selectedPG && (
         <div className="modal">
           <div className="modal-content">
