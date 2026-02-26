@@ -6,26 +6,23 @@ import { useRouter } from "next/navigation";
 
 const ADMIN_EMAIL = "techlifeportal@gmail.com";
 
+type Listing = {
+  id: string;
+  name: string;
+  hub: string | null;
+  location: string | null;
+  maps_url: string | null;
+  images: string[] | null;
+  status: string;
+  verified: boolean;
+  owner_id: string | null;
+};
+
 type Enquiry = {
   id: string;
   pg_name: string;
   user_name: string;
   phone: string;
-  move_in: string;
-  message: string | null;
-  status: "pending" | "approved" | "rejected";
-  created_at: string;
-  owner_id: string;
-};
-
-type OwnerRequest = {
-  id: string;
-  pg_name: string;
-  hub: string;
-  location: string;
-  maps_url: string | null;
-  owner_name: string | null;
-  owner_phone: string | null;
   status: string;
   created_at: string;
 };
@@ -34,8 +31,8 @@ export default function AdminPanel() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
+  const [pendingListings, setPendingListings] = useState<Listing[]>([]);
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
-  const [requests, setRequests] = useState<OwnerRequest[]>([]);
 
   /* ---------------- ADMIN CHECK ---------------- */
 
@@ -64,61 +61,48 @@ export default function AdminPanel() {
   const fetchData = async () => {
     setLoading(true);
 
+    // Fetch pending listings from pgs_rentals
+    const { data: listingData } = await supabase
+      .from("pgs_rentals")
+      .select("*")
+      .eq("status", "pending")
+      .eq("source", "owner")
+      .order("created_at", { ascending: false });
+
+    // Fetch enquiries
     const { data: enqData } = await supabase
       .from("pg_enquiries")
       .select("*")
       .order("created_at", { ascending: false });
 
-    const { data: reqData } = await supabase
-      .from("pg_owner_requests")
-      .select("*")
-      .order("created_at", { ascending: false });
-
+    setPendingListings(listingData || []);
     setEnquiries(enqData || []);
-    setRequests(reqData || []);
     setLoading(false);
   };
 
-  /* ---------------- ENQUIRY ACTIONS ---------------- */
+  /* ---------------- APPROVE LISTING ---------------- */
 
-  const approveEnquiry = async (id: string) => {
+  const approveListing = async (id: string) => {
     await supabase
-      .from("pg_enquiries")
-      .update({ status: "approved" })
-      .eq("id", id);
-
-    fetchData();
-  };
-
-  const rejectEnquiry = async (id: string) => {
-    await supabase
-      .from("pg_enquiries")
-      .update({ status: "rejected" })
-      .eq("id", id);
-
-    fetchData();
-  };
-
-  /* ---------------- APPROVE OWNER REQUEST ---------------- */
-
-  const approveRequest = async (request: OwnerRequest) => {
-    await supabase.from("pgs_rentals").insert([
-      {
-        name: request.pg_name,
-        hub: request.hub,
-        location: request.location,
-        maps_url: request.maps_url,
-        description: "Verified listing via TechLifePortal",
-        type: "pg",
+      .from("pgs_rentals")
+      .update({
         status: "active",
-        priority: 0,
-      },
-    ]);
+        verified: true,
+      })
+      .eq("id", id);
 
+    fetchData();
+  };
+
+  /* ---------------- REJECT LISTING ---------------- */
+
+  const rejectListing = async (id: string) => {
     await supabase
-      .from("pg_owner_requests")
-      .update({ status: "approved" })
-      .eq("id", request.id);
+      .from("pgs_rentals")
+      .update({
+        status: "rejected",
+      })
+      .eq("id", id);
 
     fetchData();
   };
@@ -127,36 +111,59 @@ export default function AdminPanel() {
 
   return (
     <main style={{ padding: 50, color: "white" }}>
-      <h1 style={{ fontSize: 30 }}>Admin Panel</h1>
+      <h1 style={{ fontSize: 28 }}>Admin Panel</h1>
 
       {loading && <p>Loading...</p>}
 
-      {/* ================= OWNER REQUESTS ================= */}
-      <h2 style={{ marginTop: 40 }}>PG Owner Requests</h2>
+      {/* ---------------- PENDING LISTINGS ---------------- */}
 
-      {requests
-        .filter((r) => r.status !== "approved")
-        .map((r) => (
-          <div
-            key={r.id}
-            style={{
-              marginTop: 20,
-              padding: 20,
-              borderRadius: 16,
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.15)",
-            }}
-          >
-            <h3>{r.pg_name}</h3>
-            <p>Hub: {r.hub}</p>
-            <p>Location: {r.location}</p>
-            <p>Owner: {r.owner_name}</p>
-            <p>Phone: {r.owner_phone}</p>
+      <h2 style={{ marginTop: 40 }}>Pending PG Listings</h2>
 
+      {pendingListings.length === 0 && (
+        <p style={{ marginTop: 20 }}>No pending listings.</p>
+      )}
+
+      {pendingListings.map((listing) => (
+        <div
+          key={listing.id}
+          style={{
+            marginTop: 20,
+            padding: 20,
+            borderRadius: 16,
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            maxWidth: 700,
+          }}
+        >
+          <h3>{listing.name}</h3>
+          <p>Hub: {listing.hub}</p>
+          <p>Location: {listing.location}</p>
+
+          {/* ---- IMAGE PREVIEW ---- */}
+          {listing.images && listing.images.length > 0 && (
+            <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+              {listing.images.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt="pg"
+                  width={120}
+                  height={90}
+                  style={{
+                    objectFit: "cover",
+                    borderRadius: 10,
+                    border: "1px solid rgba(255,255,255,0.2)",
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
+          <div style={{ marginTop: 15 }}>
             <button
-              onClick={() => approveRequest(r)}
+              onClick={() => approveListing(listing.id)}
               style={{
-                marginTop: 10,
+                marginRight: 10,
                 padding: "8px 16px",
                 borderRadius: 8,
                 background: "white",
@@ -164,12 +171,26 @@ export default function AdminPanel() {
                 fontWeight: "bold",
               }}
             >
-              Approve & Publish
+              Approve & Verify
+            </button>
+
+            <button
+              onClick={() => rejectListing(listing.id)}
+              style={{
+                padding: "8px 16px",
+                borderRadius: 8,
+                background: "rgba(239,68,68,0.9)",
+                color: "white",
+              }}
+            >
+              Reject
             </button>
           </div>
-        ))}
+        </div>
+      ))}
 
-      {/* ================= ENQUIRIES ================= */}
+      {/* ---------------- ENQUIRIES ---------------- */}
+
       <h2 style={{ marginTop: 60 }}>Tenant Enquiries</h2>
 
       {enquiries.map((enq) => (
@@ -179,48 +200,15 @@ export default function AdminPanel() {
             marginTop: 20,
             padding: 20,
             borderRadius: 16,
-            background:
-              enq.status === "approved"
-                ? "rgba(34,197,94,0.15)"
-                : enq.status === "rejected"
-                ? "rgba(239,68,68,0.15)"
-                : "rgba(255,255,255,0.08)",
+            background: "rgba(255,255,255,0.08)",
             border: "1px solid rgba(255,255,255,0.15)",
+            maxWidth: 600,
           }}
         >
           <h3>{enq.pg_name}</h3>
           <p>Name: {enq.user_name}</p>
           <p>Phone: {enq.phone}</p>
           <p>Status: {enq.status}</p>
-
-          {enq.status === "pending" && (
-            <div style={{ marginTop: 10 }}>
-              <button
-                onClick={() => approveEnquiry(enq.id)}
-                style={{
-                  marginRight: 10,
-                  padding: "8px 16px",
-                  borderRadius: 8,
-                  background: "white",
-                  color: "black",
-                }}
-              >
-                Approve
-              </button>
-
-              <button
-                onClick={() => rejectEnquiry(enq.id)}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: 8,
-                  background: "rgba(239,68,68,0.9)",
-                  color: "white",
-                }}
-              >
-                Reject
-              </button>
-            </div>
-          )}
         </div>
       ))}
     </main>
